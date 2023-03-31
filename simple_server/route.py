@@ -1,4 +1,5 @@
-from typing import Union, Callable, List, TypeVar
+from typing import Callable, List, TypeVar, Union
+
 from simple_server.logger import __logger as logger
 
 logger.module = __name__
@@ -28,7 +29,10 @@ class Tree:
         node = self._split_path(path)
         return self.__find(len(node), node)
 
-    def __add(self, n: int, nodes: List[AnyPath], func):
+    def __add(self, n: int, nodes: List[AnyPath], func) -> bool:
+        if callable(self.__find(len(nodes), nodes)):
+            raise Exception("%s 请求配置重复" % "/".join(nodes))
+
         for idx in range(n):
             if nodes[idx] == self.root:
                 logger.info("add same node ", idx, self.root, self.func)
@@ -36,16 +40,16 @@ class Tree:
             for obj in self.children:
                 logger.info("add children node ", idx, obj.root, obj.func)
                 if nodes[idx] == obj.root:
-                    self = obj
-                    return self.__add(n-1, nodes[1:], func)
-            _node = Tree(nodes[idx], func)
-            logger.info("add add node ", _node.root, _node.func)
-            self.children.append(_node)
-            self = _node
+                    return obj.__add(n-1, nodes[1:], func)
+            self.children.append(Tree(nodes[idx], func))
+            logger.info("add add node ", self.children[-1])
+            self = self.children[-1]
+        return True
 
     def __find(self, n: int, nodes: List[AnyPath]) -> Callable:
-        if n == 0 and self and callable(self.func):
+        if n == 0 and self:
             return self.func
+
         for idx in range(n):
             if nodes[idx] == self.root:
                 logger.info("find same node ", idx, self.root, self.func)
@@ -53,15 +57,15 @@ class Tree:
             for obj in self.children:
                 logger.info("find children node ", idx, obj.root, obj.func)
                 if nodes[idx] == obj.root:
-                    self = obj
-                    return self.__find(n-1, nodes[1:])
+                    return obj.__find(n-1, nodes[1:])
+        return ""
 
 
 route_map = Tree()
 route_map.add("/api/v1/index", lambda x: x+1)
-route_map.add("/api/v2/index", lambda x: x+1)
-route_map.add("/api/v2/index", lambda x: x+1)
-func = route_map.find("/api/v2/index")
+route_map.add("/api/api/index", lambda x: x+1)
+# route_map.add("/api/v2/index", lambda x: x+1)
+func = route_map.find("/api/v2/indexx")
 print(1, func(1))
 
 
