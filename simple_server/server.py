@@ -1,7 +1,9 @@
+import inspect
 import threading
 from typing import Union
 
-from simple_server.http_server import SimpleHTTPServer, SimpleRequestHandler
+from simple_server.http_server import (HTTP_METHOD, SimpleHTTPServer,
+                                       SimpleRequestHandler)
 from simple_server.logger import Logger, init_logger
 from simple_server.route import Tree
 
@@ -26,13 +28,23 @@ def get_route_map():
 
 
 def route(url: str, method: MethodSenquenceAlias = None):
+
+    def _add_class_handle(cls):
+        meth = [method.lower() for method in HTTP_METHOD if hasattr(cls, method.lower())]
+        for m in meth:
+            _url = "%s/%s" % (url, m.upper())
+            __route_map.add(_url, getattr(cls(), m))
+
     def wrapper(f):
         with __route_map_lock:
             _methods = method
             if _methods is None:
                 _methods = ["GET"]
+            if inspect.isclass(f):
+                _add_class_handle(f)
+                return
             for m in _methods:
-                _url = "%s/%s" % (url, m)
+                _url = "%s/%s" % (url, m.upper())
                 __route_map.add(_url, f)
 
     return wrapper

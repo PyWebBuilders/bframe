@@ -5,19 +5,33 @@ from simple_server.route import NoSetControllerException, ReqRepeatException
 
 logger.module = __name__
 
+HTTP_METHOD = ["GET", "POST", "PUT", "DELETE"]
+
 
 class Request:
 
     Method: str = ""
     Path: str = ""
+    Args: dict = {}
     Protoc: str = ""
     Headers: str = {}
 
     def __init__(self, method: str = "", path: str = "", protoc: str = "", headers: dict = ""):
         self.Method = method
-        self.Path = path
+        if "?" in path:
+            self.Path, self.Args = self.initializa_path(path)
+        else:
+            self.Path = path
         self.Protoc = protoc
         self.Headers = headers
+
+    def initializa_path(self, path):
+        path, args_str = path.split("?")
+        args = dict()
+        for kv_item in args_str.split("&"):
+            item = kv_item.split("=")
+            args.update({item[0]: item[1]})
+        return path, args
 
 
 class Response:
@@ -67,10 +81,10 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
         else:
             # 0x5 set response
             res = Response(body=ret)
-        
+
         logger.info(str(self))
         self.__send_response(res)
-    
+
     def dispatch(self, request: Request):
         try:
             # 0x2 match handle
