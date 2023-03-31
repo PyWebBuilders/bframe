@@ -18,55 +18,58 @@ class Tree:
         else:
             self.children = children
 
-    def _split_path(self, path: str = "", split: str = "/"):
-        return path.split(split)
+    def split_path(self, path: str = "", split: str = "/"):
+        return path.lstrip(split).split(split)
 
     def add(self, path: str = "", func: Callable = ""):
-        node = self._split_path(path)
-        self.__add(len(node), node, func)
+        node = self.split_path(path)
+        self.__add(node, func)
 
-    def find(self, path: str = ""):
-        node = self._split_path(path)
-        return self.__find(len(node), node)
+    def find(self, path: str = "") -> Callable:
+        node = self.split_path(path)
+        func = self.__find(node)
+        if not callable(func):
+            raise Exception("%s 未配置请求控制器" % "/".join(node))
+        return func
 
-    def __add(self, n: int, nodes: List[AnyPath], func) -> bool:
-        if callable(self.__find(len(nodes), nodes)):
+    def find_node(self, node: str) -> object:
+        for _node in self.children:
+            if _node.root == node:
+                return _node
+        return None
+
+    def __add(self, nodes: List[AnyPath], func: Callable, n: int = 0) -> bool:
+        if callable(self.__find(nodes)):
             raise Exception("%s 请求配置重复" % "/".join(nodes))
 
-        for idx in range(n):
-            if nodes[idx] == self.root:
-                logger.info("add same node ", idx, self.root, self.func)
-                return self.__add(n-1, nodes[1:], func)
-            for obj in self.children:
-                logger.info("add children node ", idx, obj.root, obj.func)
-                if nodes[idx] == obj.root:
-                    return obj.__add(n-1, nodes[1:], func)
-            self.children.append(Tree(nodes[idx], func))
-            logger.info("add add node ", self.children[-1])
-            self = self.children[-1]
-        return True
+        if len(nodes) == n:
+            self.func = func
+            return True
 
-    def __find(self, n: int, nodes: List[AnyPath]) -> Callable:
-        if n == 0 and self:
+        node = self.find_node(nodes[n])
+        if not node:
+            node = Tree(nodes[n])
+            self.children.append(node)
+        return node.__add(nodes, func, n+1)
+
+    def __find(self, nodes: List[AnyPath], n: int = 0) -> Callable:
+        if len(nodes) == n:
             return self.func
 
-        for idx in range(n):
-            if nodes[idx] == self.root:
-                logger.info("find same node ", idx, self.root, self.func)
-                return self.__find(n-1, nodes[1:])
-            for obj in self.children:
-                logger.info("find children node ", idx, obj.root, obj.func)
-                if nodes[idx] == obj.root:
-                    return obj.__find(n-1, nodes[1:])
-        return ""
+        node = self.find_node(nodes[n])
+        if not node:
+            return ""
+        return node.__find(nodes, n+1)
 
 
 route_map = Tree()
-route_map.add("/api/v1/index", lambda x: x+1)
-route_map.add("/api/api/index", lambda x: x+1)
+# route_map.add("/api/v1/index", lambda x: x+1)
+# route_map.add("/api/api/index", lambda x: x+1)
 # route_map.add("/api/v2/index", lambda x: x+1)
-func = route_map.find("/api/v2/indexx")
-print(1, func(1))
+# route_map.add("/api/v2/index", lambda x: x+1)
+# func = route_map.find("/api/v2/index")
+# func = route_map.find("/api/v2/indexx")
+# print(1, func(1))
 
 
 def route(url: str, method: MethodSenquenceAlias = None):
