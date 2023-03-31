@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-
+from typing import Callable
 from simple_server.logger import __logger as logger
+from simple_server.route import NoSetControllerException, ReqRepeatException
 
 logger.module = __name__
 
@@ -58,13 +59,37 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
                       self.path,
                       self.protocol_version,
                       dict(self.headers))
-        # 0x2 match handle
-        # 0x3 execute handle
-        # 0x4 solve except
-        # 0x5 set response
-        res = Response(body=">>>>?????<<<<<")
+        try:
+            ret = self.dispatch(req)
+        except Exception as e:
+            # 0x5 set response
+            res = Response(body=e.args[0])
+        else:
+            # 0x5 set response
+            res = Response(body=ret)
+        
         logger.info(str(self))
         self.__send_response(res)
+    
+    def dispatch(self, request: Request):
+        try:
+            # 0x2 match handle
+            handle = self.match_handle(request)
+            # 0x3 execute handle
+            ret = handle(request)
+            # 0x4 solve except
+        except (ReqRepeatException, NoSetControllerException) as e:
+            logger.debug(e.args)
+            raise Exception("match handle error", e.args[0])
+        except Exception as e:
+            logger.debug(e.args)
+            raise Exception("execute handle error", e.args[0])
+        return ret
+
+    def match_handle(self, request: Request) -> Callable:
+        from simple_server.server import get_route_map
+        url = "%s/%s" % (request.Path, request.Method)
+        return get_route_map().find(url)
 
     def __send_response(self, r: Response):
         self.send_response_only(r.Code)

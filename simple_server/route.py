@@ -1,11 +1,21 @@
-from typing import Callable, List, TypeVar, Union
+from typing import Callable, List, TypeVar
 
 from simple_server.logger import __logger as logger
 
 logger.module = __name__
 
-MethodSenquenceAlias = Union[tuple, list]
+
 AnyPath = TypeVar('AnyPath', int, str)
+
+
+class ReqRepeatException(Exception):
+    """请求路径配置重复"""
+    pass
+
+
+class NoSetControllerException(Exception):
+    """未配置请求控制器"""
+    pass
 
 
 class Tree:
@@ -29,7 +39,7 @@ class Tree:
         node = self.split_path(path)
         func = self.__find(node)
         if not callable(func):
-            raise Exception("%s 未配置请求控制器" % "/".join(node))
+            raise NoSetControllerException("%s 未配置请求控制器" % "/".join(node))
         return func
 
     def find_node(self, node: str) -> object:
@@ -40,7 +50,7 @@ class Tree:
 
     def __add(self, nodes: List[AnyPath], func: Callable, n: int = 0) -> bool:
         if callable(self.__find(nodes)):
-            raise Exception("%s 请求配置重复" % "/".join(nodes))
+            raise ReqRepeatException("%s 请求配置重复" % "/".join(nodes))
 
         if len(nodes) == n:
             self.func = func
@@ -60,21 +70,3 @@ class Tree:
         if not node:
             return ""
         return node.__find(nodes, n+1)
-
-
-route_map = Tree()
-# route_map.add("/api/v1/index", lambda x: x+1)
-# route_map.add("/api/api/index", lambda x: x+1)
-# route_map.add("/api/v2/index", lambda x: x+1)
-# route_map.add("/api/v2/index", lambda x: x+1)
-# func = route_map.find("/api/v2/index")
-# func = route_map.find("/api/v2/indexx")
-# print(1, func(1))
-
-
-def route(url: str, method: MethodSenquenceAlias = None):
-
-    def wrapper(f):
-        pass
-
-    return wrapper
