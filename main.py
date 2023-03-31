@@ -2,6 +2,13 @@ from simple_server.server import start, stop, route
 from simple_server.http_server import Request
 
 
+@route("/favicon.ico")
+def index(request: Request):
+    with open("favicon.ico", "rb") as f:
+        data = f.read()
+    return data
+
+
 @route("/index", method=["GET", "POST"])
 def index(request: Request):
     return "hello world"

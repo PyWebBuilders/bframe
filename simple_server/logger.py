@@ -24,8 +24,7 @@ class BaseLogger():
         self.__module = module
 
     def write(self, level, *msg):
-        _msg = "[%s] - [%s] %s\n" % (self.module,
-                                     str(datetime.datetime.now()), " ".join([str(m) for m in msg]))
+        _msg = "[%s] - [%s] %s\n" % (str(datetime.datetime.now()), self.module, " ".join([str(m) for m in msg]))
         if level >= self.level:
             self.log.write(_msg)
             self.log.flush()

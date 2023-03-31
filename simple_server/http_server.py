@@ -74,6 +74,7 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
                       self.protocol_version,
                       dict(self.headers))
         try:
+            logger.info(req.Method, req.Path)
             ret = self.dispatch(req)
         except Exception as e:
             # 0x5 set response
@@ -105,6 +106,14 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
         url = "%s/%s" % (request.Path, request.Method)
         return get_route_map().find(url)
 
+    def write(self, content):
+        if isinstance(content, bytes):
+            self.wfile.write(content)
+        elif isinstance(content, str):
+            self.wfile.write(content.encode())
+        else:
+            self.wfile.write(str(content).encode())
+
     def __send_response(self, r: Response):
         self.send_response_only(r.Code)
         self.send_header('Server', self.version_string())
@@ -115,4 +124,4 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
         if r.Body:
             self.send_header("Content-Length", len(r.Body))
         self.end_headers()
-        self.wfile.write(r.Body.encode())
+        self.write(r.Body)
