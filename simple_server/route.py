@@ -26,7 +26,7 @@ class Tree:
 
     def find(self, path: str = ""):
         node = self._split_path(path)
-        self.__find(len(node), node)
+        return self.__find(len(node), node)
 
     def __add(self, n: int, nodes: List[AnyPath], func):
         for idx in range(n):
@@ -43,7 +43,9 @@ class Tree:
             self.children.append(_node)
             self = _node
 
-    def __find(self, n: int, nodes: List[AnyPath]):
+    def __find(self, n: int, nodes: List[AnyPath]) -> Callable:
+        if n == 0 and self and callable(self.func):
+            return self.func
         for idx in range(n):
             if nodes[idx] == self.root:
                 logger.info("find same node ", idx, self.root, self.func)
@@ -53,18 +55,14 @@ class Tree:
                 if nodes[idx] == obj.root:
                     self = obj
                     return self.__find(n-1, nodes[1:])
-            _node = Tree(nodes[idx])
-            logger.info("find add node ", _node.root, _node.func)
-            self.children.append(_node)
-            self = _node
 
 
 route_map = Tree()
-# route_map.add("/api/v1/index")
-# route_map.add("/api/v2/index")
-# route_map.add("/api/v2/index")
-# route_map.find("/api/v2/index")
-# print(1)
+route_map.add("/api/v1/index", lambda x: x+1)
+route_map.add("/api/v2/index", lambda x: x+1)
+route_map.add("/api/v2/index", lambda x: x+1)
+func = route_map.find("/api/v2/index")
+print(1, func(1))
 
 
 def route(url: str, method: MethodSenquenceAlias = None):
