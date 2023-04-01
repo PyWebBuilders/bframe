@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Callable
+from urllib.parse import unquote
+
 from simple_server.logger import __logger as logger
-from simple_server.route import NoSetControllerException, ReqRepeatException
 
 logger.module = __name__
 
@@ -30,7 +30,7 @@ class Request:
         args = dict()
         for kv_item in args_str.split("&"):
             item = kv_item.split("=")
-            args.update({item[0]: item[1]})
+            args.update({unquote(item[0]): unquote(item[1])})
         return path, args
 
 
@@ -47,7 +47,13 @@ class Response:
 
 
 class SimpleHTTPServer(HTTPServer):
-    pass
+
+    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, application=None):
+        super().__init__(server_address, RequestHandlerClass, bind_and_activate)
+        self.application = application
+
+    def set_app(self, application):
+        self.application = application
 
 
 class HTTPHandleMix:
@@ -75,36 +81,13 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
                       dict(self.headers))
         try:
             logger.info(req.Method, req.Path)
-            ret = self.dispatch(req)
+            res = self.server.application(req)
         except Exception as e:
-            # 0x5 set response
-            res = Response(body=e.args[0])
-        else:
-            # 0x5 set response
-            res = Response(body=ret)
+            logger.info(e.args)
+            res = Response(code=500,
+                           body=e.args[0])
 
-        logger.info(str(self))
         self.__send_response(res)
-
-    def dispatch(self, request: Request):
-        try:
-            # 0x2 match handle
-            handle = self.match_handle(request)
-            # 0x3 execute handle
-            ret = handle(request)
-            # 0x4 solve except
-        except (ReqRepeatException, NoSetControllerException) as e:
-            logger.debug(e.args)
-            raise Exception("match handle error", e.args[0])
-        except Exception as e:
-            logger.debug(e.args)
-            raise Exception("execute handle error", e.args[0])
-        return ret
-
-    def match_handle(self, request: Request) -> Callable:
-        from simple_server.server import get_route_map
-        url = "%s/%s" % (request.Path, request.Method)
-        return get_route_map().find(url)
 
     def write(self, content):
         if isinstance(content, bytes):
@@ -118,7 +101,7 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
         self.send_response_only(r.Code)
         self.send_header('Server', self.version_string())
         self.send_header('Date', self.date_time_string())
-        for head, val in r.Headers:
+        for head, val in r.Headers.items():
             self.send_header(head, val)
 
         if r.Body:
