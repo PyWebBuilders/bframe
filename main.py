@@ -33,4 +33,4 @@ class Index:
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(address="0.0.0.0")

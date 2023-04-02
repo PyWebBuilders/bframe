@@ -107,6 +107,8 @@ class Frame(_Frame):
 
     def wrapper_response(self, resp: Any) -> Response:
         self.Logger.info("wrapper_response:", str(resp)[:20])
+        if isinstance(resp, Response):
+            return resp
         if isinstance(resp, (str, bytes)):
             return Response(code=200,
                             body=resp)
@@ -116,15 +118,15 @@ class Frame(_Frame):
                             body=json.dumps(resp))
 
     def dispatch(self, request: Request):
+        # self.Logger.info("thread:", threading.enumerate())
         try:
             handle = self.match_handle(request)
-            # 0x3 execute handle
             response = self.wrapper_response(handle(request))
-            # 0x4 solve except
         except NoSetControllerException as e:
             self.Logger.debug(e.args)
-            raise Exception("match handle error", e.args[0])
+            response = Response(code=404)
         except Exception as e:
             self.Logger.debug(e.args)
             raise Exception("execute handle error", e.args[0])
-        return response
+        finally:
+            return response
