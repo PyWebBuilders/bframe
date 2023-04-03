@@ -1,6 +1,9 @@
 import datetime
+import os
 import sys
 from typing import TextIO
+
+from simple_server.utils import archive_file
 
 INFO = 0x0  # info
 DEBUG = 0x1  # debug
@@ -12,6 +15,7 @@ class BaseLogger():
     def __init__(self, module, level: int = INFO, log_file: str = "log.log", out: TextIO = sys.stdout):
         self.__module = module
         self.level = level
+        archive_file(os.getcwd(), log_file)
         self.log = open(log_file, "a", encoding="utf-8")
         self.out = out
 
