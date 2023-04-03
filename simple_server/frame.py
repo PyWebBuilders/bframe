@@ -35,21 +35,25 @@ class _Frame():
     def get(self, url: str):
         def wrapper(f):
             self.add_route(url, f, "GET")
+            return f
         return wrapper
 
     def post(self, url: str):
         def wrapper(f):
             self.add_route(url, f, "POST")
+            return f
         return wrapper
 
     def put(self, url: str):
         def wrapper(f):
             self.add_route(url, f, "PUT")
+            return f
         return wrapper
 
     def delete(self, url: str):
         def wrapper(f):
             self.add_route(url, f, "DELETE")
+            return f
         return wrapper
 
     def run(self, address: str = "127.0.0.1", port: int = 7256):

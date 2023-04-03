@@ -11,6 +11,12 @@ def index(request: Request):
     return data
 
 
+@app.get("/main")
+@app.get("/home")
+def home(request: Request):
+    return request.Headers
+
+
 @app.route("/", method=["GET", "POST"])
 def index(request: Request):
     return "index"
