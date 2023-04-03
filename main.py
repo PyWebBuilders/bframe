@@ -1,11 +1,11 @@
+from simple_server.ctx import request
 from simple_server.frame import Frame
-from simple_server.http_server import Request
 
 app = Frame(__name__)
 
 
 @app.get("/favicon.ico")
-def index(request: Request):
+def index():
     with open("favicon.ico", "rb") as f:
         data = f.read()
     return data
@@ -13,40 +13,41 @@ def index(request: Request):
 
 @app.get("/main")
 @app.get("/home")
-def home(request: Request):
+def home():
     return request.Headers
 
 
 @app.route("/", method=["GET", "POST"])
-def index(request: Request):
+def index():
     return "index"
 
 
 @app.route("/index2", method=["GET", "POST"])
 @app.route("/index", method=["GET", "POST"])
-def index(request: Request):
+def index():
+    print(request.Method)
     return "hello world"
 
 
 @app.route("/indexClass")
 class Index:
 
-    def get(self, request: Request):
+    def get(self):
         return {"msg": "get, 你好 %s" % (request.Args.get("name", "client"))}
 
-    def post(self, request):
+    def post(self):
         return "post"
 
-    def put(self, request):
+    def put(self):
         return "put"
 
-    def delete(self, request):
+    def delete(self):
         return "delete"
 
 
 if __name__ == "__main__":
     app.run(address="0.0.0.0")
-    
+
     # 如果你需要使用wsgi协议,请使用wsgi_proxy对app进行处理
     # from simple_server.wsgi_server import WSGIProxy
     # from wsgiref.simple_server import make_server
