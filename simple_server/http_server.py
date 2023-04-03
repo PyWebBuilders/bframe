@@ -28,6 +28,9 @@ class Request:
     def initializa_path(self, path):
         path, args_str = path.split("?")
         args = dict()
+        
+        if args_str == "":
+            return path, args
         for kv_item in args_str.split("&"):
             item = kv_item.split("=")
             args.update({unquote(item[0]): unquote(item[1])})

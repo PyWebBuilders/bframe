@@ -8,6 +8,7 @@ from simple_server.http_server import (HTTP_METHOD, Request, Response,
 from simple_server.logger import Logger as Log
 from simple_server.logger import init_logger
 from simple_server.route import NoSetControllerException, Tree
+from simple_server.utils import to_bytes
 
 MethodSenquenceAlias = Union[tuple, list]
 
@@ -57,6 +58,7 @@ class _Frame():
         return wrapper
 
     def run(self, address: str = "127.0.0.1", port: int = 7256):
+        self.Logger.info("run mode: no wsgi")
         try:
             if self.Server is None:
                 with self.ServerLock:
@@ -113,14 +115,15 @@ class Frame(_Frame):
     def wrapper_response(self, resp: Any) -> Response:
         self.Logger.info("wrapper_response:", str(resp)[:20])
         if isinstance(resp, Response):
+            resp.Body = to_bytes(resp.Body)
             return resp
         if isinstance(resp, (str, bytes)):
             return Response(code=200,
-                            body=resp)
+                            body=to_bytes(resp))
         if isinstance(resp, dict):
             return Response(code=200,
                             headers={"Content-Type": "application/json"},
-                            body=json.dumps(resp))
+                            body=to_bytes(json.dumps(resp)))
 
     def dispatch(self, request: Request):
         # self.Logger.info("thread:", threading.enumerate())
