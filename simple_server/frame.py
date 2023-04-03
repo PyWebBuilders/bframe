@@ -77,6 +77,7 @@ class Frame(_Frame):
     def route(self, url: str, method: MethodSenquenceAlias = None):
         def wrapper(f):
             self.add_route(url, f, method)
+            return f
         return wrapper
 
     def add_route(self, url: str, func_or_class: Callable, method: MethodSenquenceAlias = None):

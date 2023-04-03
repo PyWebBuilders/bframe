@@ -11,6 +11,12 @@ def index(request: Request):
     return data
 
 
+@app.route("/", method=["GET", "POST"])
+def index(request: Request):
+    return "index"
+
+
+@app.route("/index2", method=["GET", "POST"])
 @app.route("/index", method=["GET", "POST"])
 def index(request: Request):
     return "hello world"
