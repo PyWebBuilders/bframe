@@ -3,6 +3,7 @@ import json
 import threading
 from typing import Any, Callable, Union
 
+from simple_server import __version__
 from simple_server.http_server import (HTTP_METHOD, Request, Response,
                                        SimpleHTTPServer, SimpleRequestHandler)
 from simple_server.logger import Logger as Log
@@ -14,6 +15,9 @@ MethodSenquenceAlias = Union[tuple, list]
 
 
 class _Frame():
+
+    version = "frame/%s" % __version__
+
     # http server
     Server: SimpleHTTPServer = None
     ServerLock: threading.Lock = threading.Lock()

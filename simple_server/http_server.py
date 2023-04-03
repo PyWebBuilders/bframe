@@ -102,7 +102,7 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
 
     def __send_response(self, r: Response):
         self.send_response_only(r.Code)
-        self.send_header('Server', self.version_string())
+        self.send_header('Server', self.server.application.version)
         self.send_header('Date', self.date_time_string())
         for head, val in r.Headers.items():
             self.send_header(head, val)

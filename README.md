@@ -58,10 +58,10 @@ def home(request: Request):
 
 
 if __name__ == "__main__":
-    from simple_server.wsgi_server import wsgi_proxy
+    from simple_server.wsgi_server import WSGIProxy
     from wsgiref.simple_server import make_server
 
-    with make_server('', 7256, wsgi_proxy(app)) as httpd:
+    with make_server('', 7256, WSGIProxy(app)) as httpd:
         print("Serving on port 7256...")
         httpd.serve_forever()
 ```

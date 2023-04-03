@@ -1,15 +1,19 @@
 import email
 import time
 from http import HTTPStatus
-
+import typing
 from simple_server.http_server import Request, Response
 from simple_server.logger import __logger as logger
 
 logger.module = __name__
 
 
-def wsgi_proxy(app):
-    def response_status(code):
+class WSGIProxy:
+
+    def __init__(self, application):
+        self.application = application
+
+    def response_status(self, code):
         responses = {
             v: (v.phrase, v.description)
             for v in HTTPStatus.__members__.values()
@@ -17,13 +21,13 @@ def wsgi_proxy(app):
         if code in responses:
             return "%s %s" % (code, responses[code][0])
 
-    def response_headers(headers):
-        headers['Server'] = "simple server"
+    def response_headers(self, headers):
+        headers['Server'] = self.application.version
         headers['Date'] = email.utils.formatdate(time.time(), usegmt=True)
         ret = [(k, v) for k, v in headers.items()]
         return ret
 
-    def wsgi(environ, start_response):
+    def wsgi_app(self, environ: dict, start_response: typing.Callable) -> typing.Any:
         logger.info("run mode: wsgi")
         headers = {k[len("HTTP_"):].lower(): v for k,
                    v in environ.items() if k.startswith("HTTP")}
@@ -36,10 +40,11 @@ def wsgi_proxy(app):
         )
         setattr(r, "environ", environ)
 
-        response: Response = app(r)
-        start_response(response_status(response.Code),
-                       response_headers(response.Headers))
+        response: Response = self.application(r)
+        start_response(self.response_status(response.Code),
+                       self.response_headers(response.Headers))
 
         return [response.Body]
 
-    return wsgi
+    def __call__(self, environ: dict, start_response: typing.Callable) -> typing.Any:
+        return self.wsgi_app(environ, start_response)
