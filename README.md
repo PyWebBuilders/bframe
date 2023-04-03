@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
 ### wsgi支持
 
-若您需要使用wsgi功能的支持，使用`wsgi_proxy`进行包装即可
+若您需要使用wsgi功能的支持，使用`WSGIProxy`类进行包装即可
 
 ```python
 from simple_server.ctx import request

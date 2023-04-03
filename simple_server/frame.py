@@ -4,7 +4,7 @@ import threading
 from typing import Any, Callable, Union
 
 from simple_server import __version__
-from simple_server.ctx import set_request
+from simple_server.ctx import request
 from simple_server.http_server import (HTTP_METHOD, Request, Response,
                                        SimpleHTTPServer, SimpleRequestHandler)
 from simple_server.logger import Logger as Log
@@ -130,11 +130,11 @@ class Frame(_Frame):
                             headers={"Content-Type": "application/json"},
                             body=to_bytes(json.dumps(resp)))
 
-    def dispatch(self, request: Request):
+    def dispatch(self, r: Request):
         # self.Logger.info("thread:", threading.enumerate())
         try:
-            set_request(request)
-            handle = self.match_handle(request)
+            request.push(r)
+            handle = self.match_handle(r)
             response = self.wrapper_response(handle())
         except NoSetControllerException as e:
             self.Logger.debug(e.args)

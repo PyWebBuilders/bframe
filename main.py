@@ -19,7 +19,7 @@ def home():
 
 @app.route("/", method=["GET", "POST"])
 def index():
-    return "index"
+    return request.Method
 
 
 @app.route("/index2", method=["GET", "POST"])

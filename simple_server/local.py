@@ -27,3 +27,6 @@ class LocalProxy():
     def __getattr__(self, name):
         obj = getattr(self.__local, self.__name)
         return getattr(obj, name)
+    
+    def push(self, value):
+        setattr(self.__local, self.__name, value)
