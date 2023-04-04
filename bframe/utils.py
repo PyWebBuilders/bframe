@@ -39,7 +39,7 @@ def resolve_filename_conflict(target_folder: str, basename: str) -> str:
             return newname
 
 
-def archive_file(target_folder: str, filename: str, size: int = 5 << 10):
+def archive_file(target_folder: str, filename: str, size: int = 5 << 20):
     filepath = os.path.join(target_folder, filename)
     if not os.path.exists(filepath):
         return
