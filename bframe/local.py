@@ -35,18 +35,3 @@ class LocalProxy():
     def __getattr__(self, name: str):
         obj = getattr(self.__local, self.__name)
         return getattr(obj, name)
-
-    def push(self, value: t.Any):
-        setattr(self.__local, self.__name, value)
-
-    def pop(self):
-        try:
-            delattr(self.__local, self.__name)
-        except Exception as e:
-            logger.info("local pop: ", e.args)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.pop()

@@ -1,5 +1,5 @@
 from bframe import request
-from bframe import Frame, abort
+from bframe import Frame, abort, Redirect
 from bframe.http_server import Response
 
 
@@ -21,6 +21,9 @@ def home():
 
 @app.route("/", method=["GET", "POST"])
 def index():
+    url = request.Args.get("url")
+    if url:
+        return Redirect(url)
     return request.Method
 
 
