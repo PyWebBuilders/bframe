@@ -67,3 +67,34 @@ if __name__ == "__main__":
         print("Serving on port 7256...")
         httpd.serve_forever()
 ```
+
+
+### 添加钩子支持
+
+
+1. 定义请求钩子 
+
+    ```python
+    # 定义请求钩子
+    @app.add_before_handle
+    def before_02():
+        if request.Method == "POST":
+            return "disallow method"
+    ```
+2. 定义响应钩子 
+
+    ```python
+    # 定义响应钩子
+    @app.add_after_handle
+    def after_xx(resp: Response):
+        print("resp:", resp.Code)
+        return resp
+    ```
+3. 自定义错误响应 
+
+    ```python
+    # 自定义错误响应
+    @app.add_error_handle(401)
+    def err_401():
+        return "401 error"
+    ```

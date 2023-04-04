@@ -1,6 +1,13 @@
-import os
 import datetime
+import os
 import typing as t
+from http import HTTPStatus
+
+
+RESPONSES_DICT = {
+    v: (v.phrase, v.description)
+    for v in HTTPStatus.__members__.values()
+}
 
 
 def now() -> datetime.datetime:
@@ -39,3 +46,27 @@ def archive_file(target_folder: str, filename: str, size: int = 5 << 10):
     if os.stat(filepath).st_size >= size:
         new_filename = resolve_filename_conflict(target_folder, filename)
         os.rename(filepath, new_filename)
+
+
+def get_code_desc(code: int) -> str:
+    return RESPONSES_DICT.get(code)[0]
+
+
+class AbortExecept(Exception):
+    pass
+
+
+def abort(code: int, desc: str = ""):
+    if desc == "" or not desc:
+        desc = get_code_desc(code)
+    raise AbortExecept(code, desc)
+
+
+def parse_execept_code(e: Exception):
+    if isinstance(e, AbortExecept):
+        code = e.args[0]
+    elif len(e.args) >= 2 and e.args[0].isdigit():
+        code = e.args[0]
+    else:
+        code = 500
+    return code

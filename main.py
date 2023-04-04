@@ -1,5 +1,7 @@
 from bframe import request
-from bframe import Frame
+from bframe import Frame, abort
+from bframe.http_server import Response
+
 
 app = Frame(__name__)
 
@@ -26,7 +28,35 @@ def index():
 @app.route("/index", method=["GET", "POST"])
 def index():
     print(request.Method)
+    abort(401)
+    # raise
     return "hello world"
+
+
+# 定义请求钩子
+@app.add_before_handle
+def before_01():
+    print("req:", request.Method)
+
+
+# 定义请求钩子
+@app.add_before_handle
+def before_02():
+    if request.Method == "POST":
+        return "disallow method"
+
+
+# 定义响应钩子
+@app.add_after_handle
+def after_xx(resp: Response):
+    print("resp:", resp.Code)
+    return resp
+
+
+# 自定义错误响应
+@app.add_error_handle(401)
+def err_401():
+    return "401 error"
 
 
 @app.route("/indexClass")
