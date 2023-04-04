@@ -34,6 +34,8 @@ def resolve_filename_conflict(target_folder: str, basename: str) -> str:
 
 def archive_file(target_folder: str, filename: str, size: int = 5 << 10):
     filepath = os.path.join(target_folder, filename)
+    if not os.path.exists(filepath):
+        return
     if os.stat(filepath).st_size >= size:
         new_filename = resolve_filename_conflict(target_folder, filename)
         os.rename(filepath, new_filename)

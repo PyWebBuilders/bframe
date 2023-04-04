@@ -1,4 +1,4 @@
-from simple_server.local import Local, LocalProxy
+from bframe.local import Local, LocalProxy
 
 
 __request_ctx: Local = Local()

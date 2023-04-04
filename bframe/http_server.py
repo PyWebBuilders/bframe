@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import unquote
 
-from simple_server.logger import __logger as logger
+from bframe.logger import __logger as logger
 
 logger.module = __name__
 

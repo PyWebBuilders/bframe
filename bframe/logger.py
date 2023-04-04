@@ -3,7 +3,7 @@ import os
 import sys
 from typing import TextIO
 
-from simple_server.utils import archive_file
+from bframe.utils import archive_file
 
 INFO = 0x0  # info
 DEBUG = 0x1  # debug

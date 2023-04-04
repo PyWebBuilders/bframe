@@ -1,6 +1,6 @@
 from typing import Callable, List, TypeVar
 
-from simple_server.logger import __logger as logger
+from bframe.logger import __logger as logger
 
 logger.module = __name__
 

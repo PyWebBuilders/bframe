@@ -10,8 +10,8 @@
 ### web server 自定义协议
 
 ```python
-from simple_server.ctx import request
-from simple_server.frame import Frame
+from bframe.ctx import request
+from bframe.frame import Frame
 
 
 app = Frame(__name__)
@@ -39,8 +39,8 @@ if __name__ == "__main__":
 若您需要使用wsgi功能的支持，使用`WSGIProxy`类进行包装即可
 
 ```python
-from simple_server.ctx import request
-from simple_server.frame import Frame
+from bframe.ctx import request
+from bframe.frame import Frame
 
 
 app = Frame(__name__)
@@ -60,7 +60,7 @@ def home():
 
 
 if __name__ == "__main__":
-    from simple_server.wsgi_server import WSGIProxy
+    from bframe.wsgi_server import WSGIProxy
     from wsgiref.simple_server import make_server
 
     with make_server('', 7256, WSGIProxy(app)) as httpd:

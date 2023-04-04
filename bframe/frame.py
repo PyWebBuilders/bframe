@@ -3,14 +3,14 @@ import json
 import threading
 from typing import Any, Callable, Union
 
-from simple_server import __version__
-from simple_server.ctx import request
-from simple_server.http_server import (HTTP_METHOD, Request, Response,
+from bframe import __version__
+from bframe.ctx import request
+from bframe.http_server import (HTTP_METHOD, Request, Response,
                                        SimpleHTTPServer, SimpleRequestHandler)
-from simple_server.logger import Logger as Log
-from simple_server.logger import init_logger
-from simple_server.route import NoSetControllerException, Tree
-from simple_server.utils import to_bytes
+from bframe.logger import Logger as Log
+from bframe.logger import init_logger
+from bframe.route import NoSetControllerException, Tree
+from bframe.utils import to_bytes
 
 MethodSenquenceAlias = Union[tuple, list]
 

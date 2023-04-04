@@ -2,8 +2,8 @@ import email
 import time
 from http import HTTPStatus
 import typing
-from simple_server.http_server import Request, Response
-from simple_server.logger import __logger as logger
+from bframe.http_server import Request, Response
+from bframe.logger import __logger as logger
 
 logger.module = __name__
 
