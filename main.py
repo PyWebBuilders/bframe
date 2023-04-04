@@ -1,5 +1,5 @@
-from bframe.ctx import request
-from bframe.frame import Frame
+from bframe import request
+from bframe import Frame
 
 app = Frame(__name__)
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     app.run(address="0.0.0.0")
 
     # 如果你需要使用wsgi协议,请使用wsgi_proxy对app进行处理
-    # from bframe.wsgi_server import WSGIProxy
+    # from bframe import WSGIProxy
     # from wsgiref.simple_server import make_server
     # with make_server('', 7256, WSGIProxy(app)) as httpd:
     #     print("Serving on port 7256...")

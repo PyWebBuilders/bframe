@@ -88,7 +88,7 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
         except Exception as e:
             logger.info(e.args)
             res = Response(code=500,
-                           body=e.args[0])
+                           body="Internal Server Error")
 
         self.__send_response(res)
 
