@@ -1,9 +1,9 @@
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 
-__all__ = ["request", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]
+__all__ = ["request", "g", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]
 
-from .ctx import request
+from .ctx import request, g
 from .frame import Frame
 from .http_server import Redirect
 from .logger import Logger

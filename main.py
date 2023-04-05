@@ -1,4 +1,4 @@
-from bframe import request
+from bframe import request, g
 from bframe import Frame, abort, Redirect
 from bframe.http_server import Response
 
@@ -16,7 +16,13 @@ def index():
 @app.get("/main")
 @app.get("/home")
 def home():
-    return request.Headers
+    print(g.name)
+    headers = request.Headers
+    headers.update({
+        "g_name": g.name,
+        "g_url": g.url,
+    })
+    return headers
 
 
 @app.route("/", method=["GET", "POST"])
@@ -39,6 +45,9 @@ def index():
 # 定义请求钩子
 @app.add_before_handle
 def before_01():
+    name = request.Args.get("name")
+    g.name = name
+    g.url = request.Path
     print("req:", request.Method)
 
 
