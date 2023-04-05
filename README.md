@@ -2,6 +2,20 @@
 
 > `wranning`: same flask, not flask!
 
+
+### use
+
+```shell
+pip install bframe -i https://pypi.org/simple
+```
+
+or 
+
+```shell
+git clone https://github.com/Bean-jun/bframe.git
+python setup.py install
+```
+
 ### demo
 
 -> main.py
