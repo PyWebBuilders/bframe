@@ -112,15 +112,20 @@ class Request:
             line_list = line.split(b"\r\n")
             if len(line_list) >= 5 and is_package(line):
                 name, filename, filetype, body = "", "", "", b""
-                for idx, __line in enumerate(line_list):
+                type_status = False
+                name_status = False
+                for __line in line_list:
                     if __line.startswith((b"Content-Type", b"content-type")):
                         filetype = __line[len("Content-Type: "):]
+                        type_status = True
                         continue
                     if __line.startswith((b"Content-Disposition: form-data;")):
                         name, filename = get_file_filed_name(__line)
+                        name_status = True
                         continue
-                    if idx > 3 and idx < len(line_list):
-                        body += __line + b"\r\n"
+                    if type_status and name_status:
+                        break
+                body = b"\r\n".join(line_list[4:len(line_list)-1])
                 self.File[to_str(name)] = BaseFile(to_str(name), to_str(filename), to_str(filetype), body)
             else:
                 __name = get_filed_name(line_list[1])
