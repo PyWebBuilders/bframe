@@ -54,16 +54,26 @@ class WSGIProxy:
         logger.info("run mode: wsgi")
         headers = {k[len("HTTP_"):].lower(): v for k,
                    v in environ.items() if k.startswith("HTTP")}
-        r = Request(
+        headers.update({
+            "content-type": environ["CONTENT_TYPE"],
+            "content-length": environ["CONTENT_LENGTH"],
+        })
+        req = Request(
             method=environ.get("REQUEST_METHOD"),
             path="%s?%s" % (environ.get("PATH_INFO"),
                             environ.get("QUERY_STRING")),
             protoc=environ.get("SERVER_PROTOCOL"),
             headers=headers,
         )
-        setattr(r, "environ", environ)
+        # TODO:解析请求体
+        # input = environ["wsgi.input"]
+        # d = x.read(int(environ["CONTENT_LENGTH"]))
+        if req.method != "GET":
+            length = req.Headers.get("content-length") or 0
+            req._Request__parse_body(environ["wsgi.input"].read(int(length)))
+        setattr(req, "environ", environ)
 
-        response: Response = self.application(r)
+        response: Response = self.application(req)
         start_response(self.response_status(response.Code),
                        self.response_headers(response.Headers))
 

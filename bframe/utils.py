@@ -54,6 +54,15 @@ def to_bytes(c: t.Any) -> bytes:
         return str(c).encode()
 
 
+def to_str(c: t.Any) -> str:
+    if isinstance(c, bytes):
+        return c.decode()
+    elif isinstance(c, str):
+        return c
+    else:
+        return str(c)
+
+
 def resolve_filename_conflict(target_folder: str, basename: str) -> str:
     name, ext = os.path.splitext(basename)
     while True:

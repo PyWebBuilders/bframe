@@ -21,14 +21,35 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import json
+import re
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import unquote
 
 from bframe.logger import __logger as logger
+from bframe.utils import to_bytes, to_str
 
 logger.module = __name__
 
 HTTP_METHOD = ["GET", "POST", "PUT", "DELETE"]
+
+
+class BaseFile:
+
+    name: str = ""
+    filename: str = ""
+    file_type: str = ""
+    body: bytes = b""
+
+    def __init__(self, name: str, filename: str, file_type: str, body: bytes) -> None:
+        self.name = name
+        self.filename = filename
+        self.file_type = file_type
+        self.body = body
+    
+    def save(self, dst):
+        with open(dst, "wb") as f:
+            f.write(self.body)
 
 
 class Request:
@@ -38,6 +59,9 @@ class Request:
     Args: dict = {}
     Protoc: str = ""
     Headers: str = {}
+    Body: str = b""
+    Data: dict = {}
+    File: dict[str:BaseFile] = {}
 
     def __init__(self, method: str = "", path: str = "", protoc: str = "", headers: dict = ""):
         self.Method = method
@@ -46,18 +70,110 @@ class Request:
         else:
             self.Path = path
         self.Protoc = protoc
-        self.Headers = headers
+        self.Headers = {k.replace("_", "-").lower(): v for k, v in headers.items()}
 
     def __initializa_path(self, path):
         path, args_str = path.split("?")
         args = dict()
-        
+
         if args_str == "":
             return path, args
         for kv_item in args_str.split("&"):
             item = kv_item.split("=")
             args.update({unquote(item[0]): unquote(item[1])})
         return path, args
+
+    def __parse_form_data(self):
+        def get_boundary(content_type):
+            return content_type[len("multipart/form-data; boundary="):]
+
+        def is_package(body):
+            if b"content-type" in body or b"Content-Type" in body:
+                return True
+            return False
+
+        def get_filed_name(line):
+            ret = re.match(b'Content-Disposition: form-data; name="(.+)"',
+                           line)
+            return ret.groups()[0]
+
+        def get_file_filed_name(line):
+            ret = re.match(b'Content-Disposition: form-data; name="(.+)"; filename="(.+)"',
+                           line)
+            return ret.groups()
+
+        content_type = self.Headers.get("content-type")
+        boundary = get_boundary(content_type)
+
+        lines = self.Body.split(to_bytes(boundary))
+        for line in lines:
+            if not line.startswith(b"\r\n"):
+                continue
+            line_list = line.split(b"\r\n")
+            if len(line_list) >= 5 and is_package(line):
+                name, filename, filetype, body = "", "", "", b""
+                for idx, __line in enumerate(line_list):
+                    if __line.startswith((b"Content-Type", b"content-type")):
+                        filetype = __line[len("Content-Type: "):]
+                        continue
+                    if __line.startswith((b"Content-Disposition: form-data;")):
+                        name, filename = get_file_filed_name(__line)
+                        continue
+                    if idx > 3 and idx < len(line_list):
+                        body += __line + b"\r\n"
+                self.File[to_str(name)] = BaseFile(to_str(name), to_str(filename), to_str(filetype), body)
+            else:
+                __name = get_filed_name(line_list[1])
+                __value = line_list[3]
+                self.Data.update({to_str(__name): to_str(__value)})
+
+    def __parse_form_urlencoded(self):
+        for kv_entitry in self.Body.split(b"&"):
+            kv_split = kv_entitry.split(b"=")
+            filed, value = kv_split[0], b""
+            if len(kv_split) == 2:
+                value = kv_split[1]
+            self.Data.update({to_str(filed): to_str(value)})
+
+    def __parse_json(self):
+        self.Data.update(json.loads(self.Body))
+
+    def __parse_body(self, data):
+        self.Body = data
+        content_type = self.Headers.get("content-type")
+
+        if content_type.startswith("multipart/form-data"):
+            return self.__parse_form_data()
+        elif content_type.startswith("application/x-www-form-urlencoded"):
+            return self.__parse_form_urlencoded()
+        elif content_type.startswith("application/json"):
+            return self.__parse_json()
+        # TODO: parse other type
+        ...
+
+    @property
+    def forms(self):
+        return self.Data
+
+    @property
+    def args(self):
+        return self.Args
+
+    @property
+    def files(self):
+        return self.File
+
+    @property
+    def method(self):
+        return self.Method
+
+    @property
+    def path(self):
+        return self.Path
+
+    @property
+    def headers(self):
+        return self.Headers
 
 
 class Response:
@@ -106,11 +222,14 @@ class HTTPHandleMix:
 class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
 
     def do_handle(self):
-        # 0x1 package request
+        # TODO:解析请求体
         req = Request(self.command,
                       self.path,
                       self.protocol_version,
                       dict(self.headers))
+        if req.method != "GET":
+            length = req.Headers.get("content-length") or 0
+            req._Request__parse_body(self.rfile.read(int(length)))
         try:
             logger.info(req.Method, req.Path)
             res = self.server.application(req)

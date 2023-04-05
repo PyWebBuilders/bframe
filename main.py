@@ -1,5 +1,6 @@
-from bframe import request, g
-from bframe import Frame, abort, Redirect
+import os
+
+from bframe import Frame, Redirect, abort, g, request
 from bframe.http_server import Response
 
 
@@ -37,7 +38,14 @@ def index():
 @app.route("/index", method=["GET", "POST"])
 def index():
     print(request.Method)
-    abort(401)
+    print(request.args)
+    print(request.forms)
+    print(request.files)
+    for name, fileObj in request.files.items():
+        print(name)
+        path = os.path.join(os.getcwd(), fileObj.filename)
+        fileObj.save(path)
+    # abort(401)
     # raise
     return "hello world"
 
@@ -52,10 +60,10 @@ def before_01():
 
 
 # 定义请求钩子
-@app.add_before_handle
-def before_02():
-    if request.Method == "POST":
-        return "disallow method"
+# @app.add_before_handle
+# def before_02():
+#     if request.Method == "POST":
+#         return "disallow method"
 
 
 # 定义响应钩子
