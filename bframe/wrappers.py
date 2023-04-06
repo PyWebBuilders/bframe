@@ -66,7 +66,7 @@ class BaseRequest:
         self.Protoc = protoc
         if headers is None:
             headers = dict()
-        self.Headers = {k.replace("_", "-").lower(): v for k, v in headers.items()}
+        self.Headers = {k.replace("_", "-").title(): v for k, v in headers.items()}
 
     def __initializa_path(self, path):
         path, args_str = path.split("?")
@@ -98,7 +98,7 @@ class BaseRequest:
                            line)
             return ret.groups()
 
-        content_type = self.Headers.get("content-type")
+        content_type = self.Headers.get("Content-Type")
         boundary = get_boundary(content_type)
 
         lines = self.Body.split(to_bytes(boundary))
@@ -145,7 +145,7 @@ class BaseRequest:
 
     def __parse_body(self, data):
         self.Body = data
-        content_type = self.Headers.get("content-type")
+        content_type = self.Headers.get("Content-Type")
 
         if content_type.startswith("multipart/form-data"):
             return self.__parse_form_data()

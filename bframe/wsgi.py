@@ -55,8 +55,8 @@ class WSGIProxy:
         headers = {k[len("HTTP_"):].lower(): v for k,
                    v in environ.items() if k.startswith("HTTP")}
         headers.update({
-            "content-type": environ["CONTENT_TYPE"],
-            "content-length": environ["CONTENT_LENGTH"],
+            "Content-Type": environ["CONTENT_TYPE"],
+            "Content-Length": environ["CONTENT_LENGTH"],
         })
         req = Request(
             method=environ.get("REQUEST_METHOD"),
@@ -69,7 +69,7 @@ class WSGIProxy:
         # input = environ["wsgi.input"]
         # d = x.read(int(environ["CONTENT_LENGTH"]))
         if req.method != "GET":
-            length = req.Headers.get("content-length") or 0
+            length = req.Headers.get("Content-Length") or 0
             req._BaseRequest__parse_body(environ["wsgi.input"].read(int(length)))
         setattr(req, "environ", environ)
 

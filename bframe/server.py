@@ -65,7 +65,7 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
                       self.protocol_version,
                       dict(self.headers))
         if req.method != "GET":
-            length = req.Headers.get("content-length") or 0
+            length = req.Headers.get("Content-Length") or 0
             req._BaseRequest__parse_body(self.rfile.read(int(length)))
         try:
             logger.info(req.Method, req.Path)
