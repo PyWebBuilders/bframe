@@ -25,7 +25,7 @@ import email
 import time
 from http import HTTPStatus
 import typing
-from bframe.http_server import Request, Response
+from bframe.server import Request, Response
 from bframe.logger import __logger as logger
 
 logger.module = __name__
@@ -70,7 +70,7 @@ class WSGIProxy:
         # d = x.read(int(environ["CONTENT_LENGTH"]))
         if req.method != "GET":
             length = req.Headers.get("content-length") or 0
-            req._Request__parse_body(environ["wsgi.input"].read(int(length)))
+            req._BaseRequest__parse_body(environ["wsgi.input"].read(int(length)))
         setattr(req, "environ", environ)
 
         response: Response = self.application(req)

@@ -26,7 +26,7 @@ import threading
 from typing import Callable, Union
 
 from bframe import __version__
-from bframe.http_server import HTTP_METHOD, Request, SimpleHTTPServer, SimpleRequestHandler
+from bframe.server import HTTP_METHOD, Request, SimpleHTTPServer, SimpleRequestHandler
 from bframe.logger import Logger as Log
 from bframe.logger import init_logger
 from bframe.route import Tree
@@ -121,7 +121,7 @@ class _Frame():
             self.Server.shutdown()
 
     def test_client(self):
-        return Client(self)
+        return TestClient(self)
 
     def dispatch(self, request: Request):
         raise NotImplemented
@@ -130,7 +130,7 @@ class _Frame():
         return self.dispatch(request)
 
 
-class Client:
+class TestClient:
 
     def __init__(self, app) -> None:
         self.app = app

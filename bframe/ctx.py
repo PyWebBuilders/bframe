@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from bframe.local import Local, LocalProxy
-from bframe.http_server import Request
+from bframe.server import Request
 
 _request_ctx: Local = Local()
 _app_ctx: Local = Local()

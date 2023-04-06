@@ -26,7 +26,7 @@ from typing import Any, Callable, Union
 
 from bframe._frame import _Frame
 from bframe.ctx import RequestCtx
-from bframe.http_server import Request, Response
+from bframe.server import Request, Response
 from bframe.route import NoSetControllerException
 from bframe.utils import get_code_desc, parse_execept_code, to_bytes
 

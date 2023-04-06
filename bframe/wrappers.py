@@ -23,15 +23,9 @@ SOFTWARE.
 """
 import json
 import re
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import unquote
 
-from bframe.logger import __logger as logger
 from bframe.utils import to_bytes, to_str
-
-logger.module = __name__
-
-HTTP_METHOD = ["GET", "POST", "PUT", "DELETE"]
 
 
 class BaseFile:
@@ -46,13 +40,13 @@ class BaseFile:
         self.filename = filename
         self.file_type = file_type
         self.body = body
-    
+
     def save(self, dst):
         with open(dst, "wb") as f:
             f.write(self.body)
 
 
-class Request:
+class BaseRequest:
 
     Method: str = ""
     Path: str = ""
@@ -128,7 +122,11 @@ class Request:
                     if type_status and name_status:
                         break
                 body = b"\r\n".join(line_list[4:len(line_list)-1])
-                self.File[to_str(name)] = BaseFile(to_str(name), to_str(filename), to_str(filetype), body)
+                self.File[to_str(name)] = BaseFile(
+                    to_str(name),
+                    to_str(filename),
+                    to_str(filetype),
+                    body)
             else:
                 __name = get_filed_name(line_list[1])
                 __value = line_list[3]
@@ -157,6 +155,9 @@ class Request:
             return self.__parse_json()
         # TODO: parse other type
         ...
+
+
+class Request(BaseRequest):
 
     @property
     def forms(self):
@@ -189,9 +190,9 @@ class Response:
     Headers: dict = {}
     Body: str = ""
 
-    def __init__(self, code: int = 200, headers: dict = dict(), body: str = "") -> None:
+    def __init__(self, code: int = 200, headers: dict = None, body: str = "") -> None:
         self.Code = code
-        self.Headers = headers
+        self.Headers = headers if headers else dict()
         self.Body = body
 
 
@@ -199,70 +200,3 @@ class Redirect(Response):
 
     def __init__(self, url: str):
         super().__init__(301, {"Location": url}, "")
-
-
-class SimpleHTTPServer(HTTPServer):
-
-    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, application=None):
-        super().__init__(server_address, RequestHandlerClass, bind_and_activate)
-        self.application = application
-
-    def set_app(self, application):
-        self.application = application
-
-
-class HTTPHandleMix:
-
-    def do_GET(self):
-        self.do_handle()
-
-    def do_POST(self):
-        self.do_handle()
-
-    def do_PUT(self):
-        self.do_handle()
-
-    def do_DELETE(self):
-        self.do_handle()
-
-
-class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
-
-    def do_handle(self):
-        # TODO:解析请求体
-        req = Request(self.command,
-                      self.path,
-                      self.protocol_version,
-                      dict(self.headers))
-        if req.method != "GET":
-            length = req.Headers.get("content-length") or 0
-            req._Request__parse_body(self.rfile.read(int(length)))
-        try:
-            logger.info(req.Method, req.Path)
-            res = self.server.application(req)
-        except Exception as e:
-            logger.info(e.args)
-            res = Response(code=500,
-                           body="Internal Server Error")
-
-        self.__send_response(res)
-
-    def write(self, content):
-        if isinstance(content, bytes):
-            self.wfile.write(content)
-        elif isinstance(content, str):
-            self.wfile.write(content.encode())
-        else:
-            self.wfile.write(str(content).encode())
-
-    def __send_response(self, r: Response):
-        self.send_response_only(r.Code)
-        self.send_header('Server', self.server.application.version)
-        self.send_header('Date', self.date_time_string())
-        for head, val in r.Headers.items():
-            self.send_header(head, val)
-
-        if r.Body:
-            self.send_header("Content-Length", len(r.Body))
-        self.end_headers()
-        self.write(r.Body)

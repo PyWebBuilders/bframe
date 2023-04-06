@@ -1,7 +1,7 @@
 import os
 
 from bframe import Frame, Redirect, abort, g, request
-from bframe.http_server import Response
+from bframe.server import Response
 
 
 app = Frame(__name__)
