@@ -58,18 +58,20 @@ class Request:
     Path: str = ""
     Args: dict = {}
     Protoc: str = ""
-    Headers: str = {}
+    Headers: dict = {}
     Body: str = b""
     Data: dict = {}
     File: dict[str:BaseFile] = {}
 
-    def __init__(self, method: str = "", path: str = "", protoc: str = "", headers: dict = ""):
+    def __init__(self, method: str = "", path: str = "", protoc: str = "", headers: dict = None):
         self.Method = method
         if "?" in path:
             self.Path, self.Args = self.__initializa_path(path)
         else:
             self.Path = path
         self.Protoc = protoc
+        if headers is None:
+            headers = dict()
         self.Headers = {k.replace("_", "-").lower(): v for k, v in headers.items()}
 
     def __initializa_path(self, path):
