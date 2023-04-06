@@ -120,8 +120,34 @@ class _Frame():
             self.Logger.info("shutdown server")
             self.Server.shutdown()
 
+    def test_client(self):
+        return Client(self)
+
     def dispatch(self, request: Request):
         raise NotImplemented
 
     def __call__(self, request: Request):
         return self.dispatch(request)
+
+
+class Client:
+
+    def __init__(self, app) -> None:
+        self.app = app
+
+    def handle(self, method, url, data=None):
+        r = Request(method, url)
+        r.Data = data if data else {}
+        return self.app(r)
+
+    def get(self, url):
+        return self.handle("GET", url)
+
+    def post(self, url, data):
+        return self.handle("POST", url, data)
+
+    def put(self, url, data):
+        return self.handle("PUT", url, data)
+
+    def delete(self, url, data):
+        return self.handle("DELETE", url, data)
