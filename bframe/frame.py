@@ -44,7 +44,6 @@ class Frame(_Frame):
         return self.RouteMap.find(url)
 
     def wrapper_response(self, resp: Any) -> Response:
-        self.Logger.info("wrapper_response:", str(resp)[:20])
         if isinstance(resp, Response):
             resp.Body = to_bytes(resp.Body)
             return resp
@@ -71,7 +70,6 @@ class Frame(_Frame):
         return wrapper
 
     def before_handle(self):
-        self.Logger.info("before_handle")
         for handle in self.before_funs_list:
             rv = handle()
             if rv:
@@ -82,7 +80,6 @@ class Frame(_Frame):
         return self.wrapper_response(handle())
 
     def error_handle(self, e):
-        self.Logger.info("error_handle")
         code = parse_execept_code(e)
         if code in self.error_funs_dict:
             response = self.wrapper_response(self.error_funs_dict[code]())
@@ -91,13 +88,11 @@ class Frame(_Frame):
         return response
 
     def finally_handle(self, response: Response):
-        self.Logger.info("finally_handle")
         for handle in self.after_funs_list:
             response = handle(response)
         return response
 
     def dispatch(self, r: Request):
-        # self.Logger.info("thread:", threading.enumerate())
         ctx = RequestCtx(r)
         with ctx:
             ctx.push()

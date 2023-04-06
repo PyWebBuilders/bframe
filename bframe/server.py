@@ -68,10 +68,8 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
             length = req.Headers.get("Content-Length") or 0
             req._BaseRequest__parse_body(self.rfile.read(int(length)))
         try:
-            logger.info(req.Method, req.Path)
             res = self.server.application(req)
         except Exception as e:
-            logger.info(e.args)
             res = Response(code=500,
                            body="Internal Server Error")
 
