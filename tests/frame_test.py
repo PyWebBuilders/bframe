@@ -3,7 +3,7 @@ import sys
 import unittest
 import json
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from _frame_demo import app
 
