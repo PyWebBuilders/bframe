@@ -59,7 +59,7 @@ class BaseRequest:
     Headers: dict = {}
     Body: str = b""
     Data: dict = {}
-    File: dict[str:BaseFile] = {}
+    File: dict[str, BaseFile] = {}
     Path_Args: dict = {}
 
     def __init__(self,
