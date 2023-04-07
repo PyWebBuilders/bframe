@@ -60,12 +60,14 @@ class BaseRequest:
     Body: str = b""
     Data: dict = {}
     File: dict[str:BaseFile] = {}
+    Path_Args: dict = {}
 
     def __init__(self,
                  method: str = "",
                  path: str = "",
                  protoc: str = "",
                  headers: dict = None):
+        self.__initializa_args()
         self.Method = method
         if "?" in path:
             self.Path, self.Args = self.__initializa_path(path)
@@ -76,6 +78,18 @@ class BaseRequest:
             headers = dict()
         self.Headers = {k.replace("_", "-").title(): v
                         for k, v in headers.items()}
+
+    def __initializa_args(self):
+        """初始化参数,避免地址引用导致数据异常"""
+        self.Method = ""
+        self.Path = ""
+        self.Args = {}
+        self.Protoc = ""
+        self.Headers = {}
+        self.Body = ""
+        self.Data = {}
+        self.File = {}
+        self.Path_Args = {}
 
     def __initializa_path(self, path):
         path, args_str = path.split("?")
@@ -166,6 +180,8 @@ class BaseRequest:
         # TODO: parse other type
         ...
 
+    def set_path_args(self, **kwds):
+        self.Path_Args.update(kwds)
 
 class Request(BaseRequest):
 

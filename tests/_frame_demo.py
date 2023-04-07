@@ -50,6 +50,28 @@ def admin():
         "msg": "获取后台数据成功"
     }
 
+@app.get("/api/user/<str:username>/profile")
+def users(username):
+    return {
+        "code": 200,
+        "status": True,
+        "msg": "获取后台数据成功",
+        "data": {
+            "username": username
+        }
+    }
+
+@app.get("/admin/api/users/<int:uid>/profile")
+def users(uid):
+    return {
+        "code": 200,
+        "status": True,
+        "msg": "获取后台数据成功",
+        "data": {
+            "user_id": uid
+        }
+    }
+
 
 @app.add_before_handle
 def before_auth():

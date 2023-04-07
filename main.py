@@ -26,8 +26,8 @@ def home():
     return headers
 
 
-@app.route("/", method=["GET", "POST"])
-def index():
+@app.route("/api/v1/<int:pk>", method=["GET", "POST"])
+def index(pk):
     url = request.Args.get("url")
     if url:
         return Redirect(url)

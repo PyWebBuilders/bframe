@@ -26,6 +26,7 @@ from typing import Any, Callable, Union
 
 from bframe._frame import _Frame
 from bframe.ctx import RequestCtx
+from bframe.ctx import request as req
 from bframe.server import Request, Response
 from bframe.route import NoSetControllerException
 from bframe.utils import get_code_desc, parse_execept_code, to_bytes
@@ -39,9 +40,9 @@ class Frame(_Frame):
     after_funs_list = list()
     error_funs_dict = dict()
 
-    def match_handle(self, request: Request) -> Callable:
-        url = "%s/%s" % (request.Path, request.Method)
-        return self.RouteMap.find(url)
+    def match_handle(self) -> Callable:
+        url = "%s/%s" % (req.Path, req.Method)
+        return self.RouteMap.find(req.set_path_args, url)
 
     def wrapper_response(self, resp: Any) -> Response:
         if isinstance(resp, Response):
@@ -75,9 +76,9 @@ class Frame(_Frame):
             if rv:
                 return rv
 
-    def dispatch_handle(self, request: Request):
-        handle = self.match_handle(request)
-        return self.wrapper_response(handle())
+    def dispatch_handle(self):
+        handle = self.match_handle()
+        return self.wrapper_response(handle(**req.Path_Args))
 
     def error_handle(self, e):
         code = parse_execept_code(e)
@@ -99,7 +100,7 @@ class Frame(_Frame):
             try:
                 response = self.before_handle()
                 if response is None:
-                    response = self.dispatch_handle(r)
+                    response = self.dispatch_handle()
                 response = self.wrapper_response(response)
             except NoSetControllerException as e:
                 self.Logger.debug(e.args)

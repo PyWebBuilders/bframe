@@ -38,6 +38,14 @@ class FrameTestCase(unittest.TestCase):
     def test_get_admin_02(self):
         response = self.client.get("/admin?user=tom")
         self.assertEqual(json.loads(response.Body).get("msg"), "获取后台数据成功", "响应数据异常")
+    
+    def test_get_users_01(self):
+        response = self.client.get("/api/user/tom/profile")
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("username"), "tom", "响应数据异常")
+
+    def test_get_users_02(self):
+        response = self.client.get("/admin/api/users/1/profile")
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("user_id"), 1, "响应数据异常")
 
 
 if __name__ == "__main__":
