@@ -35,7 +35,11 @@ WARN = 0x2  # warn
 
 class BaseLogger():
 
-    def __init__(self, module, level: int = INFO, log_file: str = "log.log", out: TextIO = sys.stdout):
+    def __init__(self,
+                 module,
+                 level: int = INFO,
+                 log_file: str = "log.log",
+                 out: TextIO = sys.stdout):
         self.__module = module
         self.level = level
         archive_file(os.getcwd(), log_file)
@@ -51,7 +55,8 @@ class BaseLogger():
         self.__module = module
 
     def write(self, level, *msg):
-        _msg = "[%s] - [%s] %s\n" % (str(datetime.datetime.now()), self.module, " ".join([str(m) for m in msg]))
+        _msg = "[%s] - [%s] %s\n" % (str(datetime.datetime.now()),
+                                     self.module, " ".join([str(m) for m in msg]))  # noqa
         if level >= self.level:
             self.log.write(_msg)
             self.log.flush()

@@ -43,7 +43,10 @@ class NoSetControllerException(Exception):
 
 class Tree:
 
-    def __init__(self, root: str = "", func: Callable = "", children: list = None) -> None:
+    def __init__(self,
+                 root: str = "",
+                 func: Callable = "",
+                 children: list = None):
         self.root = root
         self.func = func
         if children is None:
