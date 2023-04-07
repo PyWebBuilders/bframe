@@ -2,3 +2,5 @@ wheel
 twine
 html-testRunner
 autopep8
+pytest
+flake8
