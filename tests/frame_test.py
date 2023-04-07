@@ -5,7 +5,7 @@ import json
 
 sys.path.insert(0, os.path.abspath(".."))
 
-from tests._frame_demo import app
+from _frame_demo import app
 
 
 class FrameTestCase(unittest.TestCase):
