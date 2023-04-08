@@ -75,8 +75,8 @@ class _Frame():
         
         def make_url(method:str, url:str)->str:
             if url.startswith("/"):
-                url = url[1:]
-            return "%s/%s" % (m.upper(), url)
+                url = url.lstrip("/")
+            return "%s/%s" % (method, url)
         
         def _add_class_handle(cls):
             meth = [method.lower()

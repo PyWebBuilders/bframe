@@ -7,3 +7,5 @@ __pycache__/
 *.egg-info/
 reports/
 static/
+tutorial/bframer/bframer.db
+!tutorial/bframer/static
