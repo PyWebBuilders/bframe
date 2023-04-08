@@ -22,16 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import inspect
+import os
 import threading
 from typing import Callable, Union
 
 from bframe import __version__
+from bframe import request as req
 from bframe.server import HTTP_METHOD
 from bframe.server import Request
 from bframe.server import SimpleHTTPServer, SimpleRequestHandler
 from bframe.logger import Logger as Log
 from bframe.logger import init_logger
 from bframe.route import Tree
+from bframe.utils import abort
 
 MethodSenquenceAlias = Union[tuple, list]
 
@@ -51,10 +54,16 @@ class _Frame():
     # 日志
     Logger: Log = init_logger(__name__)
 
-    def __init__(self, name: str = None) -> None:
+    def __init__(self, name: str = None, static_url="static", static_folder="static"):
         self.app_name = name
         if name is None:
             self.app_name = __name__
+        self.root_path = os.path.dirname(os.path.abspath(self.app_name))
+
+        self.static_url = static_url if static_url.startswith("/") \
+            else "/%s" % static_url
+        self.static_folder = os.path.join(self.root_path, static_folder)
+        self.add_route("%s/<*:x>" % self.static_url, self.static, "GET")
 
     def add_route(self,
                   url: str,
@@ -64,7 +73,7 @@ class _Frame():
             meth = [method.lower()
                     for method in HTTP_METHOD if hasattr(cls, method.lower())]
             for m in meth:
-                _url = "%s/%s" % (url, m.upper())
+                _url = "%s/%s" % (m.upper(), url)
                 self.RouteMap.add(_url, getattr(cls(), m))
 
         with self.RouteMapLock:
@@ -78,7 +87,7 @@ class _Frame():
                 _add_class_handle(func_or_class)
                 return
             for m in _methods:
-                _url = "%s/%s" % (url, m.upper())
+                _url = "%s/%s" % (m.upper(), url)
                 self.RouteMap.add(_url, func_or_class)
 
     def get(self, url: str):
@@ -110,6 +119,17 @@ class _Frame():
             self.add_route(url, f, method)
             return f
         return wrapper
+
+    def static(self, *args, **kwds):
+        try:
+            file_path = req.path[len(self.static_url):].lstrip("/")
+            file_full_path = os.path.join(self.static_folder, file_path)
+            if not (os.path.exists(file_full_path) and os.path.isfile(file_full_path)):
+                return abort(404)
+            with open(file_full_path, "rb") as f:
+                return f.read()
+        except Exception as e:
+            return abort(500)
 
     def run(self, address: str = "127.0.0.1", port: int = 7256):
         self.Logger.info("run mode: no wsgi")

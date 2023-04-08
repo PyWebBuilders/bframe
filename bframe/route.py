@@ -21,7 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-from typing import Callable, List, TypeVar
+import re
+from typing import Callable, List, TypeVar, Union
 
 from bframe.logger import __logger as logger
 
@@ -102,9 +103,10 @@ class MatchTree():
 
     def __init__(self):
         """
-        <str:name>
-        <int:pk>
-        <reg:name>
+        <str:name>  # 字符串路径参数
+        <int:pk>    # 数字路径参数
+        <reg:name>  # 正则匹配路径参数
+        <*:name>    # 静态文件
         """
         self.left = "<"
         self.right = ">"
@@ -113,10 +115,19 @@ class MatchTree():
         self.node_type = None
         self.node_name = None
         self.rule = {
-            "str": str,
-            "int": int,
-            # "reg": "",
+            "str": lambda x : str(x),
+            "int": lambda x: int(x),
+            "reg": self.reg_match,  # 支持命名式正则匹配    eg: /api/<reg:(?P<version>v\d+$)>/users
+            "*": lambda x: str(x),  # 静态文件的支持
         }
+
+    @staticmethod
+    def reg_match(pattern, x):
+        reg = re.compile(pattern)
+        ret = reg.match(x)
+        if not ret:
+            raise
+        return ret.groupdict()
 
     def is_support_match(self, node: str) -> bool:
         """节点是否支持匹配"""
@@ -136,8 +147,16 @@ class MatchTree():
 
     def match(self, _node: str):
         """匹配新节点"""
+        is_break = False
+        if self.node_type in ["reg"]:
+            v = self.rule.get(self.node_type)(self.node_name, _node)
+            return True, v, is_break
+
+        if self.node_type in ["*"]:
+            is_break = True
+
         v = self.rule.get(self.node_type)(_node)
-        return True, {self.node_name: v}
+        return True, {self.node_name: v}, is_break
 
 
 class Tree(BaseTree):
@@ -158,16 +177,17 @@ class Tree(BaseTree):
             raise NoSetControllerException("%s 未配置请求控制器" % "/".join(node))
         return func
 
-    def find_match_node(self, node: str, call_back: Callable = None, open_match=True) -> object:
+    def find_match_node(self, node: str, call_back: Callable = None, open_match=True) -> Union[object, bool]:
         for _node in self.children:
             if open_match and _node.match and self.match_tree.is_support_match(_node.root):
-                status, value = self.match_tree.match(node)
+                # 匹配静态资源 匹配成功直接返回，不再继续匹配
+                status, value, is_break = self.match_tree.match(node)
                 if status and call_back:
                     call_back(**value)
-                    return _node
+                    return _node, is_break
             elif _node.root == node:
-                return _node
-        return None
+                return _node, False
+        return None, False
 
     def __match_add(self, nodes: List[AnyPath], func: Callable, n: int = 0) -> bool:
         if callable(self.__find_conflict(nodes)):
@@ -191,7 +211,7 @@ class Tree(BaseTree):
             return self.func
 
         # 查找是否出现相同的匹配树
-        node = self.find_match_node(nodes[n], open_match=False)
+        node, _ = self.find_match_node(nodes[n], open_match=False)
         if not node:
             return ""
         return node.__match_find(nodes, n+1)
@@ -200,7 +220,9 @@ class Tree(BaseTree):
         if len(nodes) == n:
             return self.func
 
-        node = self.find_match_node(nodes[n], call_back)
+        node, is_break = self.find_match_node(nodes[n], call_back)
         if not node:
             return ""
+        if is_break:
+            return node.func
         return node.__match_find(nodes, call_back, n+1)
