@@ -41,7 +41,7 @@ class Frame(_Frame):
     error_funs_dict = dict()
 
     def match_handle(self) -> Callable:
-        url = "%s/%s" % (req.Method, req.Path)
+        url = "%s%s" % (req.Method, req.Path)
         return self.RouteMap.find(req.set_path_args, url)
 
     def wrapper_response(self, resp: Any) -> Response:
