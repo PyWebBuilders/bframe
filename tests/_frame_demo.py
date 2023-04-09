@@ -4,17 +4,20 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bframe import Frame
-from bframe import g, request, abort
+from bframe import g, request, abort, current_app
 
 
 app = Frame(__name__)
-
+app.Config.from_py("_frame_config.py")
 
 @app.get("/")
 @app.get("/index")
 def index():
     return "hello world"
 
+@app.get("/conf")
+def conf():
+    return dict(current_app.Config)
 
 @app.route("/login", method=["POST"])
 def login():

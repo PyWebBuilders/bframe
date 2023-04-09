@@ -23,31 +23,38 @@ SOFTWARE.
 """
 from bframe.local import Local, LocalProxy
 from bframe.server import Request
+from bframe._frame import _Frame
+
 
 _request_ctx: Local = Local()
 _app_ctx: Local = Local()
 _request_name = "request"
 _app_name = "g"
+_current_app_name = "app"
 
 
 class RequestCtx():
 
     __name = _request_name
+    __app_name = _current_app_name
 
-    def __init__(self, r: Request):
+    def __init__(self, r: Request, app: _Frame = None):
         self.__request = r
+        self.__current_app_ctx = app
         self.__appctx = AppCtx()
 
     def push(self):
         setattr(_request_ctx, self.__name, self.__request)
+        setattr(_request_ctx, self.__app_name, self.__current_app_ctx)
         self.__appctx._AppCtx__push()
 
     def pop(self):
         delattr(_request_ctx, self.__name)
+        delattr(_request_ctx, self.__app_name)
         self.__appctx._AppCtx__pop()
 
     def __enter__(self):
-        return self
+        return self.push()
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.pop()
@@ -73,4 +80,5 @@ class AppCtx():
 
 
 request: Request = LocalProxy(_request_ctx, _request_name)
+current_app: _Frame = LocalProxy(_request_ctx, _current_app_name)
 g = AppCtx()

@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import json
+import os
 from typing import Any, Callable, Union
 
 from bframe._frame import _Frame
@@ -29,7 +30,10 @@ from bframe.ctx import RequestCtx
 from bframe.ctx import request as req
 from bframe.server import Request, Response
 from bframe.route import NoSetControllerException
-from bframe.utils import get_code_desc, parse_execept_code, to_bytes
+from bframe.utils import get_code_desc
+from bframe.utils import parse_execept_code
+from bframe.utils import to_bytes
+from bframe.utils import abort
 
 MethodSenquenceAlias = Union[tuple, list]
 
@@ -39,6 +43,17 @@ class Frame(_Frame):
     before_funs_list = list()
     after_funs_list = list()
     error_funs_dict = dict()
+
+    def static(self, *args, **kwds):
+        file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
+        file_full_path = os.path.join(self.static_folder, file_path)
+        if not (os.path.exists(file_full_path) and os.path.isfile(file_full_path)):
+            return abort(404)
+        try:
+            with open(file_full_path, "rb") as f:
+                return f.read()
+        except Exception as e:
+            return abort(500)
 
     def match_handle(self) -> Callable:
         url = "%s%s" % (req.Method, req.Path)
@@ -94,9 +109,9 @@ class Frame(_Frame):
         return response
 
     def dispatch(self, r: Request):
-        ctx = RequestCtx(r)
+        ctx = RequestCtx(r, self)
         with ctx:
-            ctx.push()
+            # ctx.push()    # 自动push
             try:
                 response = self.before_handle()
                 if response is None:

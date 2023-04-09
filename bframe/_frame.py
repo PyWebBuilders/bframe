@@ -27,14 +27,14 @@ import threading
 from typing import Callable, Union
 
 from bframe import __version__
-from bframe import request as req
 from bframe.server import HTTP_METHOD
 from bframe.server import Request
-from bframe.server import SimpleHTTPServer, SimpleRequestHandler
+from bframe.server import SimpleHTTPServer
+from bframe.server import SimpleRequestHandler
 from bframe.logger import Logger as Log
 from bframe.logger import init_logger
 from bframe.route import Tree
-from bframe.utils import abort
+from bframe.config import Config as config
 
 MethodSenquenceAlias = Union[tuple, list]
 
@@ -54,6 +54,9 @@ class _Frame():
     # 日志
     Logger: Log = init_logger(__name__)
 
+    # 配置文件
+    Config: config = config()
+
     def __init__(self, name: str = None, static_url="static", static_folder="static"):
         self.app_name = name
         if name is None:
@@ -72,12 +75,12 @@ class _Frame():
                   url: str,
                   func_or_class: Callable,
                   method: MethodSenquenceAlias = None):
-        
-        def make_url(method:str, url:str)->str:
+
+        def make_url(method: str, url: str) -> str:
             if url.startswith("/"):
                 url = url.lstrip("/")
             return "%s/%s" % (method, url)
-        
+
         def _add_class_handle(cls):
             meth = [method.lower()
                     for method in HTTP_METHOD if hasattr(cls, method.lower())]
@@ -136,17 +139,8 @@ class _Frame():
         self.add_route(url, self.static, "GET")
         self.init_static = True
 
-
     def static(self, *args, **kwds):
-        file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
-        file_full_path = os.path.join(self.static_folder, file_path)
-        if not (os.path.exists(file_full_path) and os.path.isfile(file_full_path)):
-            return abort(404)
-        try:
-            with open(file_full_path, "rb") as f:
-                return f.read()
-        except Exception as e:
-            return abort(500)
+        raise NotImplementedError
 
     def run(self, address: str = "127.0.0.1", port: int = 7256):
         self.Logger.info("run mode: no wsgi")
