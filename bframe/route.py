@@ -141,8 +141,7 @@ class MatchTree():
 
     def initialization(self):
         """解析node"""
-        self.node_type, self.node_name = self.node.removeprefix(self.left).\
-            removesuffix(self.right).\
+        self.node_type, self.node_name = self.node[len(self.left):len(self.node)-len(self.right)].\
             split(self.split, 1)
 
     def match(self, _node: str):
