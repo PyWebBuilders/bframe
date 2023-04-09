@@ -23,6 +23,7 @@ SOFTWARE.
 """
 import json
 import re
+import typing as t
 from urllib.parse import unquote
 
 from bframe.utils import to_bytes, to_str
@@ -59,7 +60,7 @@ class BaseRequest:
     Headers: dict = {}
     Body: str = b""
     Data: dict = {}
-    File: dict[str, BaseFile] = {}
+    File: t.Dict[str, BaseFile] = {}
     Path_Args: dict = {}
 
     def __init__(self,
