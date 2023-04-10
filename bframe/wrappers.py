@@ -104,6 +104,7 @@ class BaseRequest:
         return path, args
 
     def __parse_form_data(self):
+        disposition = b"Content-Disposition: form-data; "
         def get_boundary(content_type):
             return content_type[len("multipart/form-data; boundary="):]
 
@@ -113,14 +114,11 @@ class BaseRequest:
             return False
 
         def get_filed_name(line):
-            ret = re.match(b'Content-Disposition: form-data; name="(.+)"',
-                           line)
+            ret = re.match(disposition + b'name="(.+)"', line)
             return ret.groups()[0]
 
         def get_file_filed_name(line):
-            ret = re.match(b'Content-Disposition: form-data; \
-                            name="(.+)"; filename="(.+)"',
-                           line)
+            ret = re.match(disposition + b'name="(.+)"; filename="(.+)"', line)
             return ret.groups()
 
         content_type = self.Headers.get("Content-Type")
