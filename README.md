@@ -1,9 +1,11 @@
 # A simple python web server frame
 
+> `Please do not use in a production environment!`
+> 
 > `wranning`: same flask, not flask!
 
 
-# 1. 快速安装使用
+### 1. 快速安装使用
 
 ```shell
 pip install bframe -i https://pypi.org/simple
@@ -16,12 +18,14 @@ git clone https://github.com/Bean-jun/bframe.git
 python setup.py install
 ```
 
-# 2. 样例demo
+### 2. 样例demo
 
--> main.py
+> `main.py`
+> 
+> [https://github.com/Bean-jun/Plats.git](https://github.com/Bean-jun/Plats.git)
 
 
-# 3. web server 自定义协议
+### 3. 快速使用
 
 ```python
 from bframe import request, Redirect
@@ -51,7 +55,7 @@ if __name__ == "__main__":
     app.run(address="0.0.0.0")
 ```
 
-# 4. wsgi支持
+### 4. wsgi支持
 
 若您需要使用wsgi功能的支持，使用`WSGIProxy`类进行包装即可
 
@@ -89,7 +93,7 @@ if __name__ == "__main__":
 ```
 
 
-# 4. 添加钩子支持
+### 4. 添加钩子支持
 
 
 定义请求钩子 
@@ -122,14 +126,14 @@ def err_401():
 ```
 
 
-# 5. 支持重定向
+### 5. 支持重定向
 
-# 6. 支持g变量
+### 6. 支持g变量
 
-# 7. 解析请求体
+### 7. 解析请求体
 
-# 8. 支持路径参数匹配(字符串、数字、正则)
+### 8. 支持路径参数匹配(字符串、数字、正则)
 
-# 9. 支持静态文件
+### 9. 支持静态文件
 
-# 10. 支持解析py配置文件
+### 10. 支持解析py配置文件
