@@ -22,9 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from bframe.local import Local, LocalProxy
+from bframe.scaffold import Scaffold
 from bframe.server import Request
-from bframe._frame import _Frame
-
 
 _request_ctx: Local = Local()
 _app_ctx: Local = Local()
@@ -38,7 +37,7 @@ class RequestCtx():
     __name = _request_name
     __app_name = _current_app_name
 
-    def __init__(self, r: Request, app: _Frame = None):
+    def __init__(self, r: Request, app: Scaffold = None):
         self.__request = r
         self.__current_app_ctx = app
         self.__appctx = AppCtx()
@@ -80,5 +79,5 @@ class AppCtx():
 
 
 request: Request = LocalProxy(_request_ctx, _request_name)
-current_app: _Frame = LocalProxy(_request_ctx, _current_app_name)
+current_app: Scaffold = LocalProxy(_request_ctx, _current_app_name)
 g = AppCtx()

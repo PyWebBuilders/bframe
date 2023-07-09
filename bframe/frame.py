@@ -25,7 +25,7 @@ import json
 import os
 from typing import Any, Callable, Union
 
-from bframe._frame import _Frame
+from bframe.scaffold import Scaffold
 from bframe.ctx import RequestCtx
 from bframe.ctx import request as req
 from bframe.server import Request, Response
@@ -38,7 +38,7 @@ from bframe.utils import abort
 MethodSenquenceAlias = Union[tuple, list]
 
 
-class Frame(_Frame):
+class Frame(Scaffold):
 
     before_funs_list = list()
     after_funs_list = list()
