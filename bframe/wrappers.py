@@ -100,6 +100,9 @@ class BaseRequest:
             return path, args
         for kv_item in args_str.split("&"):
             item = kv_item.split("=")
+            if len(item) == 1:
+                args.update({unquote(item[0]): None})
+                continue
             args.update({unquote(item[0]): unquote(item[1])})
         return path, args
 
