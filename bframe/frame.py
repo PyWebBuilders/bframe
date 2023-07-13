@@ -35,8 +35,6 @@ from bframe.utils import parse_execept_code
 from bframe.utils import to_bytes
 from bframe.utils import abort
 
-MethodSenquenceAlias = Union[tuple, list]
-
 
 class Frame(Scaffold):
 

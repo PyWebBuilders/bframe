@@ -27,14 +27,15 @@ import threading
 from typing import Callable, Union
 
 from bframe import __version__
+from bframe.config import Config as config
+from bframe.logger import Logger as Log
+from bframe.logger import init_logger
+from bframe.route import Tree
 from bframe.server import HTTP_METHOD
 from bframe.server import Request
 from bframe.server import SimpleHTTPServer
 from bframe.server import SimpleRequestHandler
-from bframe.logger import Logger as Log
-from bframe.logger import init_logger
-from bframe.route import Tree
-from bframe.config import Config as config
+from bframe.testing import TestClient
 
 MethodSenquenceAlias = Union[tuple, list]
 
@@ -166,26 +167,3 @@ class Scaffold:
         if not self.init_static:
             self.init_static_url()
         return self.dispatch(request)
-
-
-class TestClient:
-
-    def __init__(self, app) -> None:
-        self.app = app
-
-    def handle(self, method, url, data=None):
-        r = Request(method, url)
-        r.Data = data if data else {}
-        return self.app(r)
-
-    def get(self, url):
-        return self.handle("GET", url)
-
-    def post(self, url, data):
-        return self.handle("POST", url, data)
-
-    def put(self, url, data):
-        return self.handle("PUT", url, data)
-
-    def delete(self, url, data):
-        return self.handle("DELETE", url, data)
