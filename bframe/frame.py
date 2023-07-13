@@ -29,9 +29,9 @@ from bframe.scaffold import Scaffold
 from bframe.ctx import RequestCtx
 from bframe.ctx import request as req
 from bframe.server import Request, Response
-from bframe.route import NoSetControllerException
+from bframe._except import NoSetControllerException
 from bframe.utils import get_code_desc
-from bframe.utils import parse_execept_code
+from bframe.utils import parse_except_code
 from bframe.utils import to_bytes
 from bframe.utils import abort
 
@@ -94,7 +94,7 @@ class Frame(Scaffold):
         return self.wrapper_response(handle(**req.Path_Args))
 
     def error_handle(self, e):
-        code = parse_execept_code(e)
+        code = parse_except_code(e)
         if code in self.error_funs_dict:
             response = self.wrapper_response(self.error_funs_dict[code]())
         else:

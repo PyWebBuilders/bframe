@@ -24,22 +24,13 @@ SOFTWARE.
 import re
 from typing import Callable, List, TypeVar, Union
 
+from bframe._except import NoSetControllerException, ReqRepeatException
 from bframe.logger import __logger as logger
 
 logger.module = __name__
 
 
 AnyPath = TypeVar('AnyPath', int, str)
-
-
-class ReqRepeatException(Exception):
-    """请求路径配置重复"""
-    pass
-
-
-class NoSetControllerException(Exception):
-    """未配置请求控制器"""
-    pass
 
 
 class BaseTree:
