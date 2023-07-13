@@ -33,7 +33,7 @@ DEBUG = 0x1  # debug
 WARN = 0x2  # warn
 
 
-class BaseLogger():
+class BaseLogger:
 
     def __init__(self,
                  module,

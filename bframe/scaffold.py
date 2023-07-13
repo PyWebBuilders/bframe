@@ -39,7 +39,7 @@ from bframe.config import Config as config
 MethodSenquenceAlias = Union[tuple, list]
 
 
-class Scaffold():
+class Scaffold:
 
     version = "bframe/%s" % __version__
 

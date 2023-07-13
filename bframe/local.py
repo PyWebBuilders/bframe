@@ -27,7 +27,7 @@ from bframe.logger import __logger as logger
 logger.module = __name__
 
 
-class Local():
+class Local:
 
     def __init__(self):
         super().__setattr__("storage", {})
@@ -51,7 +51,7 @@ class Local():
             pass
 
 
-class LocalProxy():
+class LocalProxy:
 
     def __init__(self, local: Local, name: str) -> None:
         self.__local = local

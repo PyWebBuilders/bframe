@@ -8,13 +8,11 @@ from bframe.ctx import RequestCtx, g, request
 from bframe.server import Request
 
 
-
 class CtxTestCase(unittest.TestCase):
 
     def setUp(self):
         self.req = Request(method="GET", path="/api/xxx/dddd", headers={"location": "www.python.org"})
         self.req_ctx = RequestCtx(self.req)
-        
 
     def test_request(self):
         self.req_ctx.push()

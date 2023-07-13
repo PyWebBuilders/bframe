@@ -99,7 +99,7 @@ class BaseTree:
         return node.__find(nodes, n+1)
 
 
-class MatchTree():
+class MatchTree:
 
     def __init__(self):
         """

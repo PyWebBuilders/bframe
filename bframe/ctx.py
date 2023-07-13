@@ -32,7 +32,7 @@ _app_name = "g"
 _current_app_name = "app"
 
 
-class RequestCtx():
+class RequestCtx:
 
     __name = _request_name
     __app_name = _current_app_name
@@ -59,7 +59,7 @@ class RequestCtx():
         self.pop()
 
 
-class AppCtx():
+class AppCtx:
 
     __name = _app_name
 
