@@ -38,12 +38,15 @@ class BaseLogger:
     def __init__(self,
                  module,
                  level: int = INFO,
+                 write_file: bool = False,
                  log_file: str = "log.log",
                  out: TextIO = sys.stdout):
         self.__module = module
         self.level = level
+        self.write_file = write_file
         archive_file(os.getcwd(), log_file)
-        self.log = open(log_file, "a", encoding="utf-8")
+        if self.write_file:
+            self.log = open(log_file, "a", encoding="utf-8")
         self.out = out
 
     @property
@@ -58,8 +61,9 @@ class BaseLogger:
         _msg = "[%s] - [%s] %s\n" % (str(datetime.datetime.now()),
                                      self.module, " ".join([str(m) for m in msg]))  # noqa
         if level >= self.level:
-            self.log.write(_msg)
-            self.log.flush()
+            if self.write_file:
+                self.log.write(_msg)
+                self.log.flush()
         self.out.write(_msg)
 
     def info(self, *msg):
