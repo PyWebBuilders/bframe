@@ -18,78 +18,35 @@ git clone https://github.com/Bean-jun/bframe.git
 python setup.py install
 ```
 
-### 2. 样例demo
-
-> `main.py`
-> 
-> [https://github.com/Bean-jun/Plats.git](https://github.com/Bean-jun/Plats.git)
-
-
-### 3. 快速使用
+### 2. 快速入门
 
 ```python
-from bframe import request, Redirect
 from bframe import Frame
-
 
 app = Frame(__name__)
 
 
-@app.get("/favicon.ico")
-def index():
-    with open("favicon.ico", "rb") as f:
-        data = f.read()
-    return data
-
-
-@app.get("/main")
-@app.get("/home")
+@app.get("/")
+@app.get("/index")
 def home():
-    url = request.Args.get("url")
-    if url:
-        return Redirect(url)
-    return request.Headers
+    return "hello world"
 
 
 if __name__ == "__main__":
-    app.run(address="0.0.0.0")
+    app.run()
 ```
 
-### 4. wsgi支持
+### 3. wsgi支持
 
 若您需要使用wsgi功能的支持，使用`WSGIProxy`类进行包装即可
 
 ```python
-from bframe import request, Redirect
-from bframe import Frame
+from bframe import WSGIProxy
+from wsgiref.simple_server import make_server
 
-
-app = Frame(__name__)
-
-
-@app.get("/favicon.ico")
-def index():
-    with open("favicon.ico", "rb") as f:
-        data = f.read()
-    return data
-
-
-@app.get("/main")
-@app.get("/home")
-def home():
-    url = request.Args.get("url")
-    if url:
-        return Redirect(url)
-    return request.Headers
-
-
-if __name__ == "__main__":
-    from bframe import WSGIProxy
-    from wsgiref.simple_server import make_server
-
-    with make_server('', 7256, WSGIProxy(app)) as httpd:
-        print("Serving on port 7256...")
-        httpd.serve_forever()
+with make_server('', 7256, WSGIProxy(app)) as httpd:
+    print("Serving on port 7256...")
+    httpd.serve_forever()
 ```
 
 
@@ -101,7 +58,7 @@ if __name__ == "__main__":
 ```python
 # 定义请求钩子
 @app.add_before_handle
-def before_02():
+def before_01():
     if request.Method == "POST":
         return "disallow method"
 ```
@@ -111,7 +68,7 @@ def before_02():
 ```python
 # 定义响应钩子
 @app.add_after_handle
-def after_xx(resp: Response):
+def after_01(resp: Response):
     print("resp:", resp.Code)
     return resp
 ```
@@ -128,12 +85,69 @@ def err_401():
 
 ### 5. 支持重定向
 
+```python
+from bframe import Redirect, request
+
+@app.get("/short_url")
+def short_url():
+    return Redirect(request.args.get("returnUrl"))
+```
+
 ### 6. 支持g变量
+
+```python
+from bframe import Frame, g, request
+
+app = Frame(__name__)
+
+
+@app.add_before_handle
+def before_01():
+    username = request.Headers.get("username")
+    g.username = username
+
+@app.get("/profile")
+def profile():
+    return {"username": g.username}
+```
 
 ### 7. 解析请求体
 
+```python
+from bframe import request
+
+
+@app.route("/", ["get", "post"])
+def index():
+    print({"args": request.args,
+           "forms": request.forms,
+           "files": request.files,
+           })
+    return "ok"
+```
+
 ### 8. 支持路径参数匹配(字符串、数字、正则)
+
+```python
+@app.get("/api/<reg:(?P<version>v\d+$)>/user/<int:pk>")
+def user_api(version, pk):
+    return {"api_version": version, "path_args": pk}
+```
 
 ### 9. 支持静态文件
 
+```python
+app = Frame(__name__, static_url="static", static_folder="static")
+```
+
 ### 10. 支持解析py配置文件
+
+```python
+app.Config.from_py("config")
+```
+
+### 2. 样例参考
+
+> `main.py`
+> 
+> [https://github.com/Bean-jun/Plats.git](https://github.com/Bean-jun/Plats.git)
