@@ -41,7 +41,6 @@ MethodSenquenceAlias = Union[tuple, list]
 
 
 class Scaffold:
-
     version = "bframe/%s" % __version__
 
     # http server
@@ -70,68 +69,56 @@ class Scaffold:
             static_folder = static_folder.lstrip("/")
         self.static_url = static_url
         self.static_folder = os.path.join(self.root_path, static_folder)
-        self.init_static = False    # 将静态文件的匹配放置在最后处理
+        self.init_static = False  # 将静态文件的匹配放置在最后处理
+
+    def make_url(self, method: str, url: str) -> str:
+        if url.startswith("/"):
+            url = url.lstrip("/")
+        return "%s/%s" % (method, url)
+
+    def add_class_route(self, cls, url, method=None):
+        meth = [method.lower()
+                for method in HTTP_METHOD if hasattr(cls, method.lower())]
+        for m in meth:
+            _url = self.make_url(m.upper(), url)
+            self.RouteMap.add(_url, getattr(cls(), m))
+
+    def add_func_route(self, func, url, method):
+        for m in method:
+            _url = self.make_url(m.upper(), url)
+            self.RouteMap.add(_url, func)
 
     def add_route(self,
                   url: str,
                   func_or_class: Callable,
                   method: MethodSenquenceAlias = None):
-
-        def make_url(method: str, url: str) -> str:
-            if url.startswith("/"):
-                url = url.lstrip("/")
-            return "%s/%s" % (method, url)
-
-        def _add_class_handle(cls):
-            meth = [method.lower()
-                    for method in HTTP_METHOD if hasattr(cls, method.lower())]
-            for m in meth:
-                _url = make_url(m.upper(), url)
-                self.RouteMap.add(_url, getattr(cls(), m))
-
         with self.RouteMapLock:
-            _methods = method
-            if _methods is None:
-                _methods = ["GET"]
-            if not isinstance(_methods, (tuple, list)):
-                _methods = [_methods]
+            method = method if method is not None else ["GET"]
+            method = method if isinstance(method, (tuple, list)) else [method]
 
             if inspect.isclass(func_or_class):
-                _add_class_handle(func_or_class)
-                return
-            for m in _methods:
-                _url = make_url(m.upper(), url)
-                self.RouteMap.add(_url, func_or_class)
-
-    def get(self, url: str):
-        def wrapper(f):
-            self.add_route(url, f, "GET")
-            return f
-        return wrapper
-
-    def post(self, url: str):
-        def wrapper(f):
-            self.add_route(url, f, "POST")
-            return f
-        return wrapper
-
-    def put(self, url: str):
-        def wrapper(f):
-            self.add_route(url, f, "PUT")
-            return f
-        return wrapper
-
-    def delete(self, url: str):
-        def wrapper(f):
-            self.add_route(url, f, "DELETE")
-            return f
-        return wrapper
+                self.add_class_route(func_or_class, url, method)
+            else:
+                self.add_func_route(func_or_class, url, method)
 
     def route(self, url: str, method: MethodSenquenceAlias = None):
         def wrapper(f):
             self.add_route(url, f, method)
             return f
+
         return wrapper
+
+    def get(self, url: str):
+        return self.route(url, "GET")
+
+    def post(self, url: str):
+        return self.route(url, "POST")
+
+    def put(self, url: str):
+        return self.route(url, "PUT")
+
+    def delete(self, url: str):
+        return self.route(url, "DELETE")
 
     def init_static_url(self):
         url = "%s/<*:x>" % self.static_url
