@@ -146,7 +146,7 @@ app = Frame(__name__, static_url="static", static_folder="static")
 app.Config.from_py("config")
 ```
 
-### 2. 样例参考
+### 11. 样例参考
 
 > `main.py`
 > 
