@@ -30,7 +30,6 @@ from bframe.utils import to_bytes, to_str
 
 
 class BaseFile:
-
     name: str = ""
     filename: str = ""
     file_type: str = ""
@@ -52,13 +51,12 @@ class BaseFile:
 
 
 class BaseRequest:
-
     Method: str = ""
     Path: str = ""
     Args: dict = {}
     Protoc: str = ""
     Headers: dict = {}
-    Body: str = b""
+    Body: t.Union[str, bytes] = b""
     Data: dict = {}
     File: t.Dict[str, BaseFile] = {}
     Path_Args: dict = {}
@@ -68,10 +66,10 @@ class BaseRequest:
                  path: str = "",
                  protoc: str = "",
                  headers: dict = None):
-        self.__initializa_args()
+        self.__initialize_args()
         self.Method = method
         if "?" in path:
-            self.Path, self.Args = self.__initializa_path(path)
+            self.Path, self.Args = BaseRequest.__initialize_path(path)
         else:
             self.Path = path
         self.Protoc = protoc
@@ -80,7 +78,7 @@ class BaseRequest:
         self.Headers = {k.replace("_", "-").title(): v
                         for k, v in headers.items()}
 
-    def __initializa_args(self):
+    def __initialize_args(self):
         """初始化参数,避免地址引用导致数据异常"""
         self.Method = ""
         self.Path = ""
@@ -92,7 +90,8 @@ class BaseRequest:
         self.File = {}
         self.Path_Args = {}
 
-    def __initializa_path(self, path):
+    @staticmethod
+    def __initialize_path(path):
         path, args_str = path.split("?")
         args = dict()
 
@@ -108,6 +107,7 @@ class BaseRequest:
 
     def __parse_form_data(self):
         disposition = b"Content-Disposition: form-data; "
+
         def get_boundary(content_type):
             return content_type[len("multipart/form-data; boundary="):]
 
@@ -147,7 +147,7 @@ class BaseRequest:
                         continue
                     if type_status and name_status:
                         break
-                body = b"\r\n".join(line_list[4:len(line_list)-1])
+                body = b"\r\n".join(line_list[4:len(line_list) - 1])
                 self.File[to_str(name)] = BaseFile(
                     to_str(name),
                     to_str(filename),
@@ -169,7 +169,7 @@ class BaseRequest:
     def __parse_json(self):
         self.Data.update(json.loads(self.Body))
 
-    def __parse_body(self, data):
+    def parse_body(self, data):
         self.Body = data
         if not self.Body or self.Headers.get("Content-Length") in [0, "0"]:
             return
@@ -216,12 +216,11 @@ class Request(BaseRequest):
 
 
 class Response:
-
     Code: int = 200
     Headers: dict = {}
     Body: str = ""
 
-    def __init__(self, code: int = 200, headers: dict = None, body: str = ""):
+    def __init__(self, code: int = 200, headers: dict = None, body: t.Union[str, bytes] = ""):
         self.Code = code
         self.Headers = headers if headers else dict()
         self.Body = body

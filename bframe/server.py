@@ -35,7 +35,7 @@ class SimpleHTTPServer(HTTPServer):
 
     def __init__(self,
                  server_address,
-                 RequestHandlerClass,
+                 RequestHandlerClass,   # noqa
                  bind_and_activate=True,
                  application=None):
         super().__init__(server_address,
@@ -72,10 +72,10 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
                       dict(self.headers))
         if req.method != "GET":
             length = req.Headers.get("Content-Length") or 0
-            req._BaseRequest__parse_body(self.rfile.read(int(length)))
+            req.parse_body(self.rfile.read(int(length)))
         try:
             res = self.server.application(req)
-        except Exception:
+        except Exception:   # noqa
             res = Response(code=500,
                            body="Internal Server Error")
 

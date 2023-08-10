@@ -23,7 +23,7 @@ SOFTWARE.
 """
 import json
 import os
-from typing import Any, Callable, Union
+from typing import Any, Callable
 
 from bframe.scaffold import Scaffold
 from bframe.ctx import RequestCtx
