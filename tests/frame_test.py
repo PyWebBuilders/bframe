@@ -50,7 +50,23 @@ class FrameTestCase(unittest.TestCase):
     def test_config_01(self):
         response = self.client.get("/conf")
         self.assertEqual(json.loads(response.Body), {"HOST": "0.0.0.0", "PORT": 7256}, "响应数据异常")
+    
+    def test_class_UserInfo_01(self):
+        response = self.client.get("/userinfo")
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "get", "响应数据异常")
+    
+    def test_class_UserInfo_02(self):
+        response = self.client.post("/userinfo", {})
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "post", "响应数据异常")
+    
+    def test_class_UserInfo_03(self):
+        response = self.client.put("/userinfo", {})
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "put", "响应数据异常")
 
+    def test_class_UserInfo_04(self):
+        response = self.client.delete("/userinfo", {})
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "delete", "响应数据异常")
+    
 
 if __name__ == "__main__":
     unittest.main()
