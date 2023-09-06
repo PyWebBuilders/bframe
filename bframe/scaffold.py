@@ -93,13 +93,12 @@ class Scaffold:
                   func_or_class: Callable,
                   method: MethodSenquenceAlias = None):
         with self.RouteMapLock:
-            method = method if method is not None else ["GET"]
-            method = method if isinstance(method, (tuple, list)) else [method]
-
+            handle_method = method or getattr(func_or_class, "method", ("GET", ))
+            handle_method = handle_method if isinstance(handle_method, (tuple, list)) else [handle_method]
             if inspect.isclass(func_or_class):
-                self.add_class_route(func_or_class, url, method)
+                self.add_class_route(func_or_class, url, handle_method)
             else:
-                self.add_func_route(func_or_class, url, method)
+                self.add_func_route(func_or_class, url, handle_method)
 
     def route(self, url: str, method: MethodSenquenceAlias = None):
         def wrapper(f):
