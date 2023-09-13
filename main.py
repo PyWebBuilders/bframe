@@ -3,6 +3,7 @@ import os
 
 from bframe import Frame, Redirect, abort, g, request, current_app
 from bframe.server import Response
+from bframe import make_response
 
 
 app = Frame(__name__)
@@ -101,7 +102,10 @@ class Index:
 class Detail(MethodView):
 
     def get(self):
-        return "get detail"
+        ret = make_response("get detail")
+        ret.set_cookies("age", "12", path="/detail")
+        ret.set_cookies("gender", "nan")
+        return ret
 
     def post(self):
         return "post detail"
