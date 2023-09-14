@@ -281,4 +281,9 @@ def make_response(body):
     params: body # Response body
     return: a Response object
     """
+    if isinstance(body, (str, bytes)):
+        body=to_bytes(body)
+    if isinstance(body, dict):
+        body=to_bytes(json.dumps(body))
+
     return Response(body=body)

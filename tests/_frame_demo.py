@@ -6,6 +6,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from bframe import Frame
 from bframe import g, request, abort, current_app
 from bframe import MethodView
+from bframe import make_response
 
 app = Frame(__name__)
 app.Config.from_py("_frame_config.py")
@@ -36,11 +37,14 @@ def login():
             "msg": "账号密码异常"
         }
     
-    return {
+    data = {
         "code": 200,
         "status": True,
         "msg": "登录成功"
     }
+    resp = make_response(body=data)
+    resp.set_cookies("username", user)
+    return resp
 
 
 @app.get("/admin")
@@ -50,7 +54,10 @@ def admin():
     return {
         "code": 200,
         "status": True,
-        "msg": "获取后台数据成功"
+        "msg": "获取后台数据成功",
+        "cookie": {
+            k: request.Cookies[k].value for k in request.Cookies.keys()
+        }
     }
 
 @app.get("/api/user/<str:username>/profile")

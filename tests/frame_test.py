@@ -31,6 +31,10 @@ class FrameTestCase(unittest.TestCase):
         response = self.client.post("/login", {"user": "admin", "pwd": "admin"})
         self.assertEqual(json.loads(response.Body).get("msg"), "登录成功", "响应数据异常")
     
+    def test_login_set_cookie_01(self):
+        response = self.client.post("/login", {"user": "admin", "pwd": "admin"})
+        self.assertEqual(response.Cookies.get("username").value, "admin", "响应数据异常")
+    
     def test_get_admin_01(self):
         response = self.client.get("/admin")
         self.assertEqual(json.loads(response.Body).get("msg"), "小伙子，请登录一下吧", "响应数据异常")
@@ -38,6 +42,10 @@ class FrameTestCase(unittest.TestCase):
     def test_get_admin_02(self):
         response = self.client.get("/admin?user=tom")
         self.assertEqual(json.loads(response.Body).get("msg"), "获取后台数据成功", "响应数据异常")
+    
+    def test_get_admin_set_cookie_01(self):
+        response = self.client.get("/admin?user=tom", headers={"Cookie": "x-id=1"})
+        self.assertEqual(json.loads(response.Body).get("cookie", {}).get("x-id"), "1", "响应数据异常")
     
     def test_get_users_01(self):
         response = self.client.get("/api/user/tom/profile")
