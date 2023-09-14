@@ -21,12 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__version__ = "0.0.10"
+__version__ = "0.0.11"
 
 
-__all__ = ["request", "g", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]
+__all__ = ["request", "g", "current_app", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]
 
-from .ctx import g, request
+from .ctx import g, request, current_app
 from .frame import Frame
 from .logger import Logger
 from .wrappers import Redirect

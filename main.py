@@ -1,10 +1,11 @@
 import os
 
-from bframe import Frame, Redirect, abort, g, request
+from bframe import Frame, Redirect, abort, g, request, current_app
 from bframe.server import Response
 
 
 app = Frame(__name__)
+# app.Config.from_py("config.py")
 
 
 @app.get("/favicon.ico")
@@ -28,6 +29,7 @@ def home():
 
 @app.route("/api/v1/<int:pk>", method=["GET", "POST"])
 def index(pk):
+    # print(current_app.Config)
     url = request.Args.get("url")
     if url:
         return Redirect(url)
