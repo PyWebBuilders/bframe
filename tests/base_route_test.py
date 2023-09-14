@@ -25,6 +25,5 @@ class TreeTestCase(unittest.TestCase):
         self.assertEqual(func(10, 2), 8, "执行异常")
 
 
-
 if __name__ == "__main__":
     unittest.main()

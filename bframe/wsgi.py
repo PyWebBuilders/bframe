@@ -57,8 +57,8 @@ class WSGIProxy:
         headers = {k[len("HTTP_"):].lower(): v for k,
                    v in environ.items() if k.startswith("HTTP")}
         headers.update({
-            "Content-Type": environ["CONTENT_TYPE"],
-            "Content-Length": environ["CONTENT_LENGTH"],
+            "Content-Length": environ.get("CONTENT_LENGTH", 0),
+            "Content-Type": environ.get("CONTENT_TYPE"),
         })
         req = Request(
             method=environ.get("REQUEST_METHOD"),

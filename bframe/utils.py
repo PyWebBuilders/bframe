@@ -89,12 +89,14 @@ class AbortExecept(Exception):
 
 
 def abort(code: int, desc: str = ""):
-    if desc == "" or not desc:
-        desc = get_code_desc(code)
-    raise AbortExecept(code, desc)
+    try:
+        if desc == "" or not desc:
+            desc = get_code_desc(code)
+    finally:
+        raise AbortExecept(code, desc)
 
 
-def parse_execept_code(e: Exception):
+def parse_except_code(e: Exception):
     if isinstance(e, AbortExecept):
         code = e.args[0]
     elif len(e.args) >= 2 and e.args[0].isdigit():

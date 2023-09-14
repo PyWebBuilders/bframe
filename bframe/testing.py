@@ -21,14 +21,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__version__ = "0.0.12"
+from bframe.wrappers import Request
 
 
-__all__ = ["request", "g", "current_app", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]
+class TestClient:
 
-from .ctx import g, request, current_app
-from .frame import Frame
-from .logger import Logger
-from .wrappers import Redirect
-from .utils import abort
-from .wsgi import WSGIProxy
+    def __init__(self, app) -> None:
+        self.app = app
+
+    def handle(self, method, url, data=None):
+        r = Request(method, url)
+        r.Data = data if data else {}
+        return self.app(r)
+
+    def get(self, url):
+        return self.handle("GET", url)
+
+    def post(self, url, data):
+        return self.handle("POST", url, data)
+
+    def put(self, url, data):
+        return self.handle("PUT", url, data)
+
+    def delete(self, url, data):
+        return self.handle("DELETE", url, data)

@@ -21,14 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__version__ = "0.0.12"
 
 
-__all__ = ["request", "g", "current_app", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]
+class ReqRepeatException(Exception):
+    """请求路径配置重复"""
+    pass
 
-from .ctx import g, request, current_app
-from .frame import Frame
-from .logger import Logger
-from .wrappers import Redirect
-from .utils import abort
-from .wsgi import WSGIProxy
+
+class NoSetControllerException(Exception):
+    """未配置请求控制器"""
+    pass
