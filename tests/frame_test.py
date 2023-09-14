@@ -3,9 +3,9 @@ import sys
 import unittest
 import json
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from tests._frame_demo import app
+from _frame_demo import app
 
 
 class FrameTestCase(unittest.TestCase):
@@ -38,6 +38,14 @@ class FrameTestCase(unittest.TestCase):
     def test_get_admin_02(self):
         response = self.client.get("/admin?user=tom")
         self.assertEqual(json.loads(response.Body).get("msg"), "获取后台数据成功", "响应数据异常")
+    
+    def test_get_users_01(self):
+        response = self.client.get("/api/user/tom/profile")
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("username"), "tom", "响应数据异常")
+
+    def test_get_users_02(self):
+        response = self.client.get("/admin/api/users/1/profile")
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("user_id"), 1, "响应数据异常")
 
 
 if __name__ == "__main__":

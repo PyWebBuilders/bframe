@@ -23,7 +23,6 @@ SOFTWARE.
 """
 from threading import get_ident
 from bframe.logger import __logger as logger
-import typing as t
 
 logger.module = __name__
 

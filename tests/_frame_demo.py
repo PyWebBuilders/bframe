@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(".."))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bframe import Frame
 from bframe import g, request, abort
@@ -48,6 +48,28 @@ def admin():
         "code": 200,
         "status": True,
         "msg": "获取后台数据成功"
+    }
+
+@app.get("/api/user/<str:username>/profile")
+def users(username):
+    return {
+        "code": 200,
+        "status": True,
+        "msg": "获取后台数据成功",
+        "data": {
+            "username": username
+        }
+    }
+
+@app.get("/admin/api/users/<int:uid>/profile")
+def users(uid):
+    return {
+        "code": 200,
+        "status": True,
+        "msg": "获取后台数据成功",
+        "data": {
+            "user_id": uid
+        }
     }
 
 

@@ -50,13 +50,15 @@ class WSGIProxy:
         ret = [(k, v) for k, v in headers.items()]
         return ret
 
-    def wsgi_app(self, environ: dict, start_response: typing.Callable) -> typing.Any:
+    def wsgi_app(self,
+                 environ: dict,
+                 start_response: typing.Callable) -> typing.Any:
         logger.info("run mode: wsgi")
         headers = {k[len("HTTP_"):].lower(): v for k,
                    v in environ.items() if k.startswith("HTTP")}
         headers.update({
-            "content-type": environ["CONTENT_TYPE"],
-            "content-length": environ["CONTENT_LENGTH"],
+            "Content-Type": environ["CONTENT_TYPE"],
+            "Content-Length": environ["CONTENT_LENGTH"],
         })
         req = Request(
             method=environ.get("REQUEST_METHOD"),
@@ -69,8 +71,8 @@ class WSGIProxy:
         # input = environ["wsgi.input"]
         # d = x.read(int(environ["CONTENT_LENGTH"]))
         if req.method != "GET":
-            length = req.Headers.get("content-length") or 0
-            req._BaseRequest__parse_body(environ["wsgi.input"].read(int(length)))
+            length = req.Headers.get("Content-Length") or 0
+            req._BaseRequest__parse_body(environ["wsgi.input"].read(int(length)))   # noqa
         setattr(req, "environ", environ)
 
         response: Response = self.application(req)
@@ -79,5 +81,5 @@ class WSGIProxy:
 
         return [response.Body]
 
-    def __call__(self, environ: dict, start_response: typing.Callable) -> typing.Any:
+    def __call__(self, environ: dict, start_response: typing.Callable) -> typing.Any:   # noqa
         return self.wsgi_app(environ, start_response)

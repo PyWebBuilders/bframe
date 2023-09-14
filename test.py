@@ -21,8 +21,6 @@ main_suite = unittest.TestSuite()
 # 把测试用例路径添加到主套件中
 main_suite.addTest(discover)
 # 执行并生成测试报告
-now = time.strftime("%y-%m_%d_%H_%M_%S_", time.localtime(time.time()))
-# 创建配置html测试报告的相关信息的对象
 runner = HtmlTestRunner.HTMLTestRunner(stream=sys.stdout)
 # 生成html测试报告
 runner.run(main_suite)

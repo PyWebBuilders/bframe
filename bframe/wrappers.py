@@ -35,7 +35,11 @@ class BaseFile:
     file_type: str = ""
     body: bytes = b""
 
-    def __init__(self, name: str, filename: str, file_type: str, body: bytes) -> None:
+    def __init__(self,
+                 name: str,
+                 filename: str,
+                 file_type: str,
+                 body: bytes):
         self.name = name
         self.filename = filename
         self.file_type = file_type
@@ -56,8 +60,14 @@ class BaseRequest:
     Body: str = b""
     Data: dict = {}
     File: dict[str:BaseFile] = {}
+    Path_Args: dict = {}
 
-    def __init__(self, method: str = "", path: str = "", protoc: str = "", headers: dict = None):
+    def __init__(self,
+                 method: str = "",
+                 path: str = "",
+                 protoc: str = "",
+                 headers: dict = None):
+        self.__initializa_args()
         self.Method = method
         if "?" in path:
             self.Path, self.Args = self.__initializa_path(path)
@@ -66,7 +76,20 @@ class BaseRequest:
         self.Protoc = protoc
         if headers is None:
             headers = dict()
-        self.Headers = {k.replace("_", "-").lower(): v for k, v in headers.items()}
+        self.Headers = {k.replace("_", "-").title(): v
+                        for k, v in headers.items()}
+
+    def __initializa_args(self):
+        """初始化参数,避免地址引用导致数据异常"""
+        self.Method = ""
+        self.Path = ""
+        self.Args = {}
+        self.Protoc = ""
+        self.Headers = {}
+        self.Body = ""
+        self.Data = {}
+        self.File = {}
+        self.Path_Args = {}
 
     def __initializa_path(self, path):
         path, args_str = path.split("?")
@@ -94,11 +117,12 @@ class BaseRequest:
             return ret.groups()[0]
 
         def get_file_filed_name(line):
-            ret = re.match(b'Content-Disposition: form-data; name="(.+)"; filename="(.+)"',
+            ret = re.match(b'Content-Disposition: form-data; \
+                            name="(.+)"; filename="(.+)"',
                            line)
             return ret.groups()
 
-        content_type = self.Headers.get("content-type")
+        content_type = self.Headers.get("Content-Type")
         boundary = get_boundary(content_type)
 
         lines = self.Body.split(to_bytes(boundary))
@@ -145,7 +169,7 @@ class BaseRequest:
 
     def __parse_body(self, data):
         self.Body = data
-        content_type = self.Headers.get("content-type")
+        content_type = self.Headers.get("Content-Type")
 
         if content_type.startswith("multipart/form-data"):
             return self.__parse_form_data()
@@ -156,6 +180,8 @@ class BaseRequest:
         # TODO: parse other type
         ...
 
+    def set_path_args(self, **kwds):
+        self.Path_Args.update(kwds)
 
 class Request(BaseRequest):
 
@@ -190,7 +216,7 @@ class Response:
     Headers: dict = {}
     Body: str = ""
 
-    def __init__(self, code: int = 200, headers: dict = None, body: str = "") -> None:
+    def __init__(self, code: int = 200, headers: dict = None, body: str = ""):
         self.Code = code
         self.Headers = headers if headers else dict()
         self.Body = body

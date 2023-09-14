@@ -33,8 +33,14 @@ HTTP_METHOD = ["GET", "POST", "PUT", "DELETE"]
 
 class SimpleHTTPServer(HTTPServer):
 
-    def __init__(self, server_address, RequestHandlerClass, bind_and_activate=True, application=None):
-        super().__init__(server_address, RequestHandlerClass, bind_and_activate)
+    def __init__(self,
+                 server_address,
+                 RequestHandlerClass,
+                 bind_and_activate=True,
+                 application=None):
+        super().__init__(server_address,
+                         RequestHandlerClass,
+                         bind_and_activate)
         self.application = application
 
     def set_app(self, application):
@@ -65,13 +71,11 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
                       self.protocol_version,
                       dict(self.headers))
         if req.method != "GET":
-            length = req.Headers.get("content-length") or 0
+            length = req.Headers.get("Content-Length") or 0
             req._BaseRequest__parse_body(self.rfile.read(int(length)))
         try:
-            logger.info(req.Method, req.Path)
             res = self.server.application(req)
-        except Exception as e:
-            logger.info(e.args)
+        except Exception:
             res = Response(code=500,
                            body="Internal Server Error")
 

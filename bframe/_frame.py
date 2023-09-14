@@ -26,7 +26,9 @@ import threading
 from typing import Callable, Union
 
 from bframe import __version__
-from bframe.server import HTTP_METHOD, Request, SimpleHTTPServer, SimpleRequestHandler
+from bframe.server import HTTP_METHOD
+from bframe.server import Request
+from bframe.server import SimpleHTTPServer, SimpleRequestHandler
 from bframe.logger import Logger as Log
 from bframe.logger import init_logger
 from bframe.route import Tree
@@ -54,7 +56,10 @@ class _Frame():
         if name is None:
             self.app_name = __name__
 
-    def add_route(self, url: str, func_or_class: Callable, method: MethodSenquenceAlias = None):
+    def add_route(self,
+                  url: str,
+                  func_or_class: Callable,
+                  method: MethodSenquenceAlias = None):
         def _add_class_handle(cls):
             meth = [method.lower()
                     for method in HTTP_METHOD if hasattr(cls, method.lower())]
@@ -111,8 +116,8 @@ class _Frame():
         try:
             if self.Server is None:
                 with self.ServerLock:
-                    self.Server = SimpleHTTPServer(server_address=(address, port),
-                                                   RequestHandlerClass=SimpleRequestHandler,
+                    self.Server = SimpleHTTPServer(server_address=(address, port),  # noqa
+                                                   RequestHandlerClass=SimpleRequestHandler,  # noqa
                                                    application=self)
             self.Logger.info("start server http://%s:%s" % (address, port))
             self.Server.serve_forever()
@@ -124,7 +129,7 @@ class _Frame():
         return TestClient(self)
 
     def dispatch(self, request: Request):
-        raise NotImplemented
+        raise NotImplementedError
 
     def __call__(self, request: Request):
         return self.dispatch(request)
