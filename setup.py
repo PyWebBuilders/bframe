@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_packages, find_namespace_packages
 
 
 def readme():
@@ -18,7 +18,7 @@ setup(
     description="A simple python web server frame",
     long_description=readme(),
     long_description_content_type='text/markdown',
-    # 项目主页
+    license='MIT License',
     url="https://github.com/Bean-jun/bframe", 
 
     packages=find_packages(),

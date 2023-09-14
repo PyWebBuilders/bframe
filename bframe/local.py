@@ -46,7 +46,10 @@ class Local():
 
     def __delattr__(self, name: str):
         id = get_ident()
-        del self.storage[id]
+        try:
+            del self.storage[id]
+        except KeyError:
+            pass
 
 
 class LocalProxy():

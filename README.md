@@ -24,7 +24,7 @@ python setup.py install
 ### web server 自定义协议
 
 ```python
-from bframe import request
+from bframe import request, Redirect
 from bframe import Frame
 
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 若您需要使用wsgi功能的支持，使用`WSGIProxy`类进行包装即可
 
 ```python
-from bframe import request
+from bframe import request, Redirect
 from bframe import Frame
 
 
