@@ -3,7 +3,7 @@
 > `wranning`: same flask, not flask!
 
 
-### use
+# 1. 快速安装使用
 
 ```shell
 pip install bframe -i https://pypi.org/simple
@@ -16,12 +16,12 @@ git clone https://github.com/Bean-jun/bframe.git
 python setup.py install
 ```
 
-### demo
+# 2. 样例demo
 
 -> main.py
 
 
-### web server 自定义协议
+# 3. web server 自定义协议
 
 ```python
 from bframe import request, Redirect
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     app.run(address="0.0.0.0")
 ```
 
-### wsgi支持
+# 4. wsgi支持
 
 若您需要使用wsgi功能的支持，使用`WSGIProxy`类进行包装即可
 
@@ -89,41 +89,45 @@ if __name__ == "__main__":
 ```
 
 
-### 添加钩子支持
+# 4. 添加钩子支持
 
 
-1. 定义请求钩子 
+定义请求钩子 
 
-    ```python
-    # 定义请求钩子
-    @app.add_before_handle
-    def before_02():
-        if request.Method == "POST":
-            return "disallow method"
-    ```
-2. 定义响应钩子 
+```python
+# 定义请求钩子
+@app.add_before_handle
+def before_02():
+    if request.Method == "POST":
+        return "disallow method"
+```
 
-    ```python
-    # 定义响应钩子
-    @app.add_after_handle
-    def after_xx(resp: Response):
-        print("resp:", resp.Code)
-        return resp
-    ```
-3. 自定义错误响应 
+定义响应钩子 
 
-    ```python
-    # 自定义错误响应
-    @app.add_error_handle(401)
-    def err_401():
-        return "401 error"
-    ```
+```python
+# 定义响应钩子
+@app.add_after_handle
+def after_xx(resp: Response):
+    print("resp:", resp.Code)
+    return resp
+```
+
+自定义错误响应 
+
+```python
+# 自定义错误响应
+@app.add_error_handle(401)
+def err_401():
+    return "401 error"
+```
 
 
-### 支持重定向
+# 5. 支持重定向
 
-### 支持g变量
+# 6. 支持g变量
 
-### 解析请求体
+# 7. 解析请求体
 
-### 支持简易路径参数匹配
+# 8. 支持路径参数匹配(字符串、数字、正则)
+
+# 9. 支持静态文件
