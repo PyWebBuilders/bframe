@@ -2,10 +2,10 @@ import json
 from typing import Any, Callable, Union
 
 from bframe._frame import _Frame
-from bframe.ctx import request
+from bframe.ctx import RequestCtx
 from bframe.http_server import Request, Response
 from bframe.route import NoSetControllerException
-from bframe.utils import to_bytes, get_code_desc, parse_execept_code
+from bframe.utils import get_code_desc, parse_execept_code, to_bytes
 
 MethodSenquenceAlias = Union[tuple, list]
 
@@ -75,8 +75,9 @@ class Frame(_Frame):
 
     def dispatch(self, r: Request):
         # self.Logger.info("thread:", threading.enumerate())
-        with request:
-            request.push(r)
+        ctx = RequestCtx(r)
+        with ctx:
+            ctx.push()
             try:
                 response = self.before_handle()
                 if response is None:

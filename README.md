@@ -27,6 +27,9 @@ def index():
 @app.get("/main")
 @app.get("/home")
 def home():
+    url = request.Args.get("url")
+    if url:
+        return Redirect(url)
     return request.Headers
 
 
@@ -56,6 +59,9 @@ def index():
 @app.get("/main")
 @app.get("/home")
 def home():
+    url = request.Args.get("url")
+    if url:
+        return Redirect(url)
     return request.Headers
 
 
@@ -98,3 +104,6 @@ if __name__ == "__main__":
     def err_401():
         return "401 error"
     ```
+
+
+### 支持重定向

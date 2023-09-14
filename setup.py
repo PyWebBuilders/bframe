@@ -6,10 +6,13 @@ def readme():
         content = f.read()
     return content
 
+def version():
+    from bframe import __version__
+    return __version__
 
 setup(
     name="bframe",
-    version="0.0.1",
+    version=version(),
     author="Bean-jun",
     author_email="1342104001@qq.com",
     description="A simple python web server frame",

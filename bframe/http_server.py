@@ -19,13 +19,13 @@ class Request:
     def __init__(self, method: str = "", path: str = "", protoc: str = "", headers: dict = ""):
         self.Method = method
         if "?" in path:
-            self.Path, self.Args = self.initializa_path(path)
+            self.Path, self.Args = self.__initializa_path(path)
         else:
             self.Path = path
         self.Protoc = protoc
         self.Headers = headers
 
-    def initializa_path(self, path):
+    def __initializa_path(self, path):
         path, args_str = path.split("?")
         args = dict()
         
@@ -47,6 +47,12 @@ class Response:
         self.Code = code
         self.Headers = headers
         self.Body = body
+
+
+class Redirect(Response):
+
+    def __init__(self, url: str):
+        super().__init__(301, {"Location": url}, "")
 
 
 class SimpleHTTPServer(HTTPServer):
