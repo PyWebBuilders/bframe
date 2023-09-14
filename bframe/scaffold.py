@@ -57,6 +57,10 @@ class Scaffold:
     # 配置文件
     Config: config = config()
 
+     # 会话消息
+    SessionID = None
+    Session = None
+
     def __init__(self, name: str = None, static_url="static", static_folder="static"):
         self.app_name = name
         if name is None:

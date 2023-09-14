@@ -34,6 +34,9 @@ from bframe.utils import get_code_desc
 from bframe.utils import parse_except_code
 from bframe.utils import to_bytes
 from bframe.utils import abort
+from bframe.sessions import SessionMix
+from bframe.sessions import SESSION_ID
+from bframe.sessions import MemorySession
 
 
 class Frame(Scaffold):
@@ -41,6 +44,10 @@ class Frame(Scaffold):
     before_funs_list = list()
     after_funs_list = list()
     error_funs_dict = dict()
+
+    # 会话消息
+    SessionID: str = SESSION_ID
+    Session: SessionMix = MemorySession(key=SESSION_ID)
 
     def static(self, *args, **kwds):
         file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
@@ -104,12 +111,14 @@ class Frame(Scaffold):
     def finally_handle(self, response: Response):
         for handle in self.after_funs_list:
             response = handle(response)
+        self.Session.save_session(response)
         return response
 
     def dispatch(self, r: Request):
         ctx = RequestCtx(r, self)
         with ctx:
             # ctx.push()    # 自动push
+            self.Session.open_session()
             try:
                 response = self.before_handle()
                 if response is None:

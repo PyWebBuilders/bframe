@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
+import functools
+
 from bframe.local import Local, LocalProxy
 from bframe.scaffold import Scaffold
 from bframe.server import Request
@@ -30,6 +32,7 @@ _app_ctx: Local = Local()
 _request_name = "request"
 _app_name = "g"
 _current_app_name = "app"
+_session_name = "Session"
 
 
 class RequestCtx:
@@ -78,6 +81,12 @@ class AppCtx:
         return getattr(_app_ctx, self.__name).get(name)
 
 
+def find_session(app, session="Session"):
+    return getattr(app, session)
+
+
 request: Request = LocalProxy(_request_ctx, _request_name)
 current_app: Scaffold = LocalProxy(_request_ctx, _current_app_name)
 g = AppCtx()
+session = LocalProxy(functools.partial(find_session, current_app),
+                     _session_name)

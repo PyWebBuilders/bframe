@@ -24,13 +24,14 @@ SOFTWARE.
 __version__ = "0.0.14"
 
 
-from .ctx import current_app, g, request
+from .ctx import current_app, g, request, session
 from .frame import Frame
 from .logger import Logger
+from .sessions import SessionMix
 from .utils import abort
 from .view import MethodView, View
 from .wrappers import Redirect, make_response
 from .wsgi import WSGIProxy
 
-__all__ = ["request", "g", "current_app", "Frame", "Redirect",
+__all__ = ["request", "g", "current_app", "Frame", "Redirect", "session", "SessionMix",
            "Logger", "abort", "WSGIProxy", "View", "MethodView", "make_response"]

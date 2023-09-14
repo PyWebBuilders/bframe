@@ -1,9 +1,8 @@
-from bframe import MethodView
 import os
 
-from bframe import Frame, Redirect, abort, g, request, current_app
+from bframe import (Frame, MethodView, Redirect, abort, current_app, g,
+                    make_response, request, session)
 from bframe.server import Response
-from bframe import make_response
 
 
 app = Frame(__name__)
@@ -60,7 +59,7 @@ def before_01():
     name = request.Args.get("name")
     g.name = name
     g.url = request.Path
-    print("req:", request.Method)
+    # print("req:", request.Method)
 
 
 # 定义请求钩子
@@ -73,7 +72,7 @@ def before_01():
 # 定义响应钩子
 @app.add_after_handle
 def after_xx(resp: Response):
-    print("resp:", resp.Code)
+    # print("resp:", resp.Code)
     return resp
 
 
@@ -103,16 +102,19 @@ class Detail(MethodView):
 
     def get(self):
         ret = make_response("get detail")
+        import time
+        print("get session value: ", session["name"])
+        session["name"] = f"tom-{str(time.time())}"
         ret.set_cookies("age", "12", path="/detail")
         ret.set_cookies("gender", "nan")
         return ret
 
     def post(self):
         return "post detail"
-    
+
     def put(self):
         return "put detail"
-    
+
     def delete(self):
         return "delete detail"
 

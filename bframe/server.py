@@ -78,7 +78,8 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
             req.parse_body(self.rfile.read(int(length)))
         try:
             res = self.server.application(req)
-        except Exception:   # noqa
+        except Exception as e:   # noqa
+            logger.warn("[do handle error]", e.args)
             res = Response(code=500,
                            body="Internal Server Error")
 
