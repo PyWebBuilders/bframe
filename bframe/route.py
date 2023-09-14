@@ -177,7 +177,7 @@ class Tree(BaseTree):
             raise NoSetControllerException("%s 未配置请求控制器" % "/".join(node))
         return func
 
-    def find_match_node(self, node: str, call_back: Callable = None, open_match=True) -> Union[object, bool]:
+    def find_match_node(self, node: str, call_back: Callable = None, open_match: bool=True) -> Union[object, bool]:
         for _node in self.children:
             if open_match and _node.match and self.match_tree.is_support_match(_node.root):
                 # 匹配静态资源 匹配成功直接返回，不再继续匹配
@@ -214,15 +214,15 @@ class Tree(BaseTree):
         node, _ = self.find_match_node(nodes[n], open_match=False)
         if not node:
             return ""
-        return node.__match_find(nodes, n+1)
+        return node.__match_find(nodes, None, n+1, open_match=False)
 
-    def __match_find(self, nodes: List[AnyPath], call_back: Callable, n: int = 0) -> Callable:
+    def __match_find(self, nodes: List[AnyPath], call_back: Callable, n: int = 0, open_match: bool=True) -> Callable:
         if len(nodes) == n:
             return self.func
 
-        node, is_break = self.find_match_node(nodes[n], call_back)
+        node, is_break = self.find_match_node(nodes[n], call_back, open_match)
         if not node:
             return ""
         if is_break:
             return node.func
-        return node.__match_find(nodes, call_back, n+1)
+        return node.__match_find(nodes, call_back, n+1, open_match)

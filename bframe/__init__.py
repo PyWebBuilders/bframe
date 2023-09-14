@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__version__ = "0.0.9"
+__version__ = "0.0.10"
 
 
 __all__ = ["request", "g", "Frame", "Redirect", "Logger", "abort", "WSGIProxy"]

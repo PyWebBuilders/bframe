@@ -60,20 +60,29 @@ class _Frame():
             self.app_name = __name__
         self.root_path = os.path.dirname(os.path.abspath(self.app_name))
 
-        self.static_url = static_url if static_url.startswith("/") \
-            else "/%s" % static_url
+        if static_url.startswith("/"):
+            static_url = static_url.lstrip("/")
+        if static_folder.startswith("/"):
+            static_folder = static_folder.lstrip("/")
+        self.static_url = static_url
         self.static_folder = os.path.join(self.root_path, static_folder)
-        self.add_route("%s/<*:x>" % self.static_url, self.static, "GET")
+        self.init_static = False    # 将静态文件的匹配放置在最后处理
 
     def add_route(self,
                   url: str,
                   func_or_class: Callable,
                   method: MethodSenquenceAlias = None):
+        
+        def make_url(method:str, url:str)->str:
+            if url.startswith("/"):
+                url = url.lstrip("/")
+            return "%s/%s" % (method, url)
+        
         def _add_class_handle(cls):
             meth = [method.lower()
                     for method in HTTP_METHOD if hasattr(cls, method.lower())]
             for m in meth:
-                _url = "%s/%s" % (m.upper(), url)
+                _url = make_url(m.upper(), url)
                 self.RouteMap.add(_url, getattr(cls(), m))
 
         with self.RouteMapLock:
@@ -87,7 +96,7 @@ class _Frame():
                 _add_class_handle(func_or_class)
                 return
             for m in _methods:
-                _url = "%s/%s" % (m.upper(), url)
+                _url = make_url(m.upper(), url)
                 self.RouteMap.add(_url, func_or_class)
 
     def get(self, url: str):
@@ -120,12 +129,20 @@ class _Frame():
             return f
         return wrapper
 
+    def init_static_url(self):
+        url = "%s/<*:x>" % self.static_url
+        if self.static_url == "":
+            url = "<*:x>"
+        self.add_route(url, self.static, "GET")
+        self.init_static = True
+
+
     def static(self, *args, **kwds):
+        file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
+        file_full_path = os.path.join(self.static_folder, file_path)
+        if not (os.path.exists(file_full_path) and os.path.isfile(file_full_path)):
+            return abort(404)
         try:
-            file_path = req.path[len(self.static_url):].lstrip("/")
-            file_full_path = os.path.join(self.static_folder, file_path)
-            if not (os.path.exists(file_full_path) and os.path.isfile(file_full_path)):
-                return abort(404)
             with open(file_full_path, "rb") as f:
                 return f.read()
         except Exception as e:
@@ -152,6 +169,8 @@ class _Frame():
         raise NotImplementedError
 
     def __call__(self, request: Request):
+        if not self.init_static:
+            self.init_static_url()
         return self.dispatch(request)
 
 

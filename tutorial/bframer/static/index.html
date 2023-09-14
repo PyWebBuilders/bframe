@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/main.css">
+    <title>bframer</title>
+</head>
+
+<body>
+    <div class="main" id="app">
+        <div class="box">
+            <div class="nav box-block">{{ message }} <a href="/add.html">添加</a></div>
+            <div class="cont box-block" v-for="article in articles">
+                <div class="title">{{article.title}}</div>
+                <div class="content">{{article.content}}</div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.8/vue.min.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            message: 'Hello Bframer',
+            articles: [],
+        },
+        created: function () {
+            that = this;
+            axios.get(location.protocol + "//" + location.host + "/api/v1/home")
+                .then(function (resp) {
+                    if (resp.data.code === 200) {
+                        that.articles = resp.data.data;
+                    }
+                })
+                .catch(function (error) { // 请求失败处理
+                    console.log(error);
+                });
+        },
+    })
+</script>
+
+</html>

@@ -154,7 +154,7 @@ class BaseRequest:
             else:
                 __name = get_filed_name(line_list[1])
                 __value = line_list[3]
-                self.Data.update({to_str(__name): to_str(__value)})
+                self.Data.update({unquote(to_str(__name)): unquote(to_str(__value))})
 
     def __parse_form_urlencoded(self):
         for kv_entitry in self.Body.split(b"&"):
@@ -162,13 +162,15 @@ class BaseRequest:
             filed, value = kv_split[0], b""
             if len(kv_split) == 2:
                 value = kv_split[1]
-            self.Data.update({to_str(filed): to_str(value)})
+            self.Data.update({unquote(to_str(filed)): unquote(to_str(value))})
 
     def __parse_json(self):
         self.Data.update(json.loads(self.Body))
 
     def __parse_body(self, data):
         self.Body = data
+        if not self.Body or self.Headers.get("Content-Length") in [0, "0"]:
+            return
         content_type = self.Headers.get("Content-Type")
 
         if content_type.startswith("multipart/form-data"):
