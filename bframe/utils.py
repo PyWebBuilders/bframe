@@ -26,6 +26,7 @@ import os
 import typing as t
 from http import HTTPStatus
 
+from bframe._except import AbortExcept
 
 RESPONSES_DICT = {
     v: (v.phrase, v.description)
@@ -84,20 +85,16 @@ def get_code_desc(code: int) -> str:
     return RESPONSES_DICT.get(code)[0]
 
 
-class AbortExecept(Exception):
-    pass
-
-
 def abort(code: int, desc: str = ""):
     try:
         if desc == "" or not desc:
             desc = get_code_desc(code)
     finally:
-        raise AbortExecept(code, desc)
+        raise AbortExcept(code, desc)
 
 
 def parse_except_code(e: Exception):
-    if isinstance(e, AbortExecept):
+    if isinstance(e, AbortExcept):
         code = e.args[0]
     elif len(e.args) >= 2 and e.args[0].isdigit():
         code = e.args[0]

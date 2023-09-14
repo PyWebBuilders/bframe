@@ -31,3 +31,8 @@ class ReqRepeatException(Exception):
 class NoSetControllerException(Exception):
     """未配置请求控制器"""
     pass
+
+
+class AbortExcept(Exception):
+    """手动抛出异常"""
+    pass

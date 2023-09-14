@@ -1,3 +1,4 @@
+from bframe import MethodView
 import os
 
 from bframe import Frame, Redirect, abort, g, request, current_app
@@ -95,6 +96,24 @@ class Index:
 
     def delete(self):
         return "delete"
+
+
+class Detail(MethodView):
+
+    def get(self):
+        return "get detail"
+
+    def post(self):
+        return "post detail"
+    
+    def put(self):
+        return "put detail"
+    
+    def delete(self):
+        return "delete detail"
+
+
+app.add_route("/detail", Detail.as_view())
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bframe import Frame
 from bframe import g, request, abort, current_app
-
+from bframe import MethodView
 
 app = Frame(__name__)
 app.Config.from_py("_frame_config.py")
@@ -89,6 +89,34 @@ def error_401():
         "status": False,
         "msg": "小伙子，请登录一下吧"
     }
+
+
+class UserInfo(MethodView):
+
+    def return_value(self, value):
+        return {
+            "code": 200,
+            "status": True,
+            "msg": "获取后台数据成功",
+            "data": {
+                "userinfo": value
+            }
+        }
+    
+    def get(self):
+        return self.return_value("get")
+    
+    def post(self):
+        return self.return_value("post")
+    
+    def put(self):
+        return self.return_value("put")
+    
+    def delete(self):
+        return self.return_value("delete")
+
+
+app.add_route("/userinfo", UserInfo.as_view())
 
 
 if __name__ == "__main__":

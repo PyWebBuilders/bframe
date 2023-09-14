@@ -33,20 +33,20 @@ class Local:
         super().__setattr__("storage", {})
 
     def __setattr__(self, name: str, value: str):
-        id = get_ident()
-        if id in self.storage:
-            self.storage[id][name] = value
+        pk = get_ident()
+        if pk in self.storage:
+            self.storage[pk][name] = value
         else:
-            self.storage[id] = {name: value}
+            self.storage[pk] = {name: value}
 
     def __getattr__(self, name: str):
-        id = get_ident()
-        return self.storage[id][name]
+        pk = get_ident()
+        return self.storage[pk][name]
 
     def __delattr__(self, name: str):
-        id = get_ident()
+        pk = get_ident()
         try:
-            del self.storage[id]
+            del self.storage[pk]
         except KeyError:
             pass
 

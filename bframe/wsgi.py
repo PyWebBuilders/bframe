@@ -72,7 +72,7 @@ class WSGIProxy:
         # d = x.read(int(environ["CONTENT_LENGTH"]))
         if req.method != "GET":
             length = req.Headers.get("Content-Length") or 0
-            req._BaseRequest__parse_body(environ["wsgi.input"].read(int(length)))   # noqa
+            req.parse_body(environ["wsgi.input"].read(int(length)))   # noqa
         setattr(req, "environ", environ)
 
         response: Response = self.application(req)
