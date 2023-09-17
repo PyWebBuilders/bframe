@@ -49,6 +49,9 @@ class Frame(Scaffold):
     SessionID: str = SESSION_ID
     Session: SessionMix = MemorySession(key=SESSION_ID)
 
+    # 序列化
+    Serializer = json
+
     def static(self, *args, **kwds):
         file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
         file_full_path = os.path.join(self.static_folder, file_path)
@@ -71,10 +74,10 @@ class Frame(Scaffold):
         if isinstance(resp, (str, bytes)):
             return Response(code=200,
                             body=to_bytes(resp))
-        if isinstance(resp, dict):
+        if isinstance(resp, (dict, list)):
             return Response(code=200,
                             headers={"Content-Type": "application/json"},
-                            body=to_bytes(json.dumps(resp)))
+                            body=to_bytes(self.Serializer.dumps(resp)))
 
     def add_before_handle(self, f):
         self.before_funs_list.append(f)
