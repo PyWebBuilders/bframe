@@ -1,9 +1,9 @@
+import functools
 import os
 
 from bframe import (Frame, MethodView, Redirect, abort, current_app, g,
                     make_response, request, session)
 from bframe.server import Response
-
 
 app = Frame(__name__)
 # app.Config.from_py("config.py")
@@ -119,7 +119,62 @@ class Detail(MethodView):
         return "delete detail"
 
 
+books = [{
+    "id": 1,
+    "name": "海底两万里",
+    'content': "我是海底两万里"
+}, {
+    "id": 2,
+    "name": "十万个为什么",
+    "content": "十万个为什么",
+}]
+
+
+@app.get("/login")
+def login():
+    username = request.args.get("username")
+    if username:
+        session["userid"] = username
+        return "login successful"
+    return "login failed"
+
+
+@app.get("/logout")
+def logout():
+    userid = session["userid"]
+    if not userid:
+        return "logou failed"
+    session.clear()
+    return "logout successful"
+
+
+def login_required(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwds):
+        userid = session["userid"]
+        if not userid:
+            return "no login"
+        return f(*args, **kwds)
+    return wrapper
+
+
+class BookView(MethodView):
+
+    @login_required
+    def get(self):
+        return books
+
+    @login_required
+    def post(self):
+        global books
+        req = request.forms
+        req['id'] = len(books) + 1
+        books.append(req)
+        return req
+
+
 app.add_route("/detail", Detail.as_view())
+app.add_route("/book", BookView.as_view())
 
 
 if __name__ == "__main__":

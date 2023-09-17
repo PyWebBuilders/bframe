@@ -50,13 +50,15 @@ class SessionMix:
 
     def open_session(self):
         session_key = self.parse_session_id()
+        logger.info(f"open session, parse session key {session_key}")
         if not session_key or not self.has_storage(session_key):
+            logger.info(f"open session, not has_storage session key {session_key}")
             session_key = self.create_session_key()
         request.session = session_key
         logger.info(f"open session, session key {session_key}")
 
     def save_session(self, resp: Response):
-        resp.set_cookies(self.session_id, request.session, httponly=True)
+        resp.set_cookies(self.session_id, request.session, httponly=True, max_age=604800)
         logger.info("save session")
 
     def has_storage(self, session_key):
