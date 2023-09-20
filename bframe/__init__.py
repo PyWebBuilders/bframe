@@ -21,18 +21,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__version__ = "0.0.13"
+__version__ = "0.0.14"
 
 
-from .ctx import g, request, current_app
+from .ctx import current_app, g, request, session
 from .frame import Frame
 from .logger import Logger
-from .wrappers import Redirect
+from .sessions import SessionMix
 from .utils import abort
+from .view import MethodView, View
+from .wrappers import Redirect, make_response
 from .wsgi import WSGIProxy
-from .view import View, MethodView
-from .view import MethodView
 
-
-__all__ = ["request", "g", "current_app", "Frame", "Redirect",
-           "Logger", "abort", "WSGIProxy", "View", "MethodView"]
+__all__ = ["request", "g", "current_app", "Frame", "Redirect", "session", "SessionMix",
+           "Logger", "abort", "WSGIProxy", "View", "MethodView", "make_response"]

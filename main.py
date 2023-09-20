@@ -1,9 +1,9 @@
-from bframe import MethodView
+import functools
 import os
 
-from bframe import Frame, Redirect, abort, g, request, current_app
+from bframe import (Frame, MethodView, Redirect, abort, current_app, g,
+                    make_response, request, session)
 from bframe.server import Response
-
 
 app = Frame(__name__)
 # app.Config.from_py("config.py")
@@ -59,7 +59,7 @@ def before_01():
     name = request.Args.get("name")
     g.name = name
     g.url = request.Path
-    print("req:", request.Method)
+    # print("req:", request.Method)
 
 
 # 定义请求钩子
@@ -72,7 +72,7 @@ def before_01():
 # 定义响应钩子
 @app.add_after_handle
 def after_xx(resp: Response):
-    print("resp:", resp.Code)
+    # print("resp:", resp.Code)
     return resp
 
 
@@ -101,19 +101,80 @@ class Index:
 class Detail(MethodView):
 
     def get(self):
-        return "get detail"
+        ret = make_response("get detail")
+        import time
+        print("get session value: ", session["name"])
+        session["name"] = f"tom-{str(time.time())}"
+        ret.set_cookies("age", "12", path="/detail")
+        ret.set_cookies("gender", "nan")
+        return ret
 
     def post(self):
         return "post detail"
-    
+
     def put(self):
         return "put detail"
-    
+
     def delete(self):
         return "delete detail"
 
 
+books = [{
+    "id": 1,
+    "name": "海底两万里",
+    'content': "我是海底两万里"
+}, {
+    "id": 2,
+    "name": "十万个为什么",
+    "content": "十万个为什么",
+}]
+
+
+@app.get("/login")
+def login():
+    username = request.args.get("username")
+    if username:
+        session["userid"] = username
+        return "login successful"
+    return "login failed"
+
+
+@app.get("/logout")
+def logout():
+    userid = session["userid"]
+    if not userid:
+        return "logou failed"
+    session.clear()
+    return "logout successful"
+
+
+def login_required(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwds):
+        userid = session["userid"]
+        if not userid:
+            return "no login"
+        return f(*args, **kwds)
+    return wrapper
+
+
+class BookView(MethodView):
+
+    @login_required
+    def get(self):
+        return books
+
+    @login_required
+    def post(self):
+        global books
+        req = request.forms
+        req['id'] = len(books) + 1
+        books.append(req)
+        return req
+
+
 app.add_route("/detail", Detail.as_view())
+app.add_route("/book", BookView.as_view())
 
 
 if __name__ == "__main__":

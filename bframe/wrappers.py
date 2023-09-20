@@ -24,9 +24,18 @@ SOFTWARE.
 import json
 import re
 import typing as t
+from http import cookies
 from urllib.parse import unquote
 
 from bframe.utils import to_bytes, to_str
+
+
+class Cookie(cookies.SimpleCookie):
+
+    def output(self, attrs=None, header="Set-Cookie:", sep="\r\n") -> str:
+        items = sorted(self.items())
+        for key, value in items:
+            yield value.OutputString(attrs)
 
 
 class BaseFile:
@@ -60,6 +69,7 @@ class BaseRequest:
     Data: dict = {}
     File: t.Dict[str, BaseFile] = {}
     Path_Args: dict = {}
+    Cookies: Cookie = None
 
     def __init__(self,
                  method: str = "",
@@ -77,6 +87,8 @@ class BaseRequest:
             headers = dict()
         self.Headers = {k.replace("_", "-").title(): v
                         for k, v in headers.items()}
+        if "Cookie" in self.Headers:
+            self.Cookies.load(self.Headers.get("Cookie"))
 
     def __initialize_args(self):
         """初始化参数,避免地址引用导致数据异常"""
@@ -89,6 +101,7 @@ class BaseRequest:
         self.Data = {}
         self.File = {}
         self.Path_Args = {}
+        self.Cookies = Cookie()
 
     @staticmethod
     def __initialize_path(path):
@@ -156,7 +169,7 @@ class BaseRequest:
             else:
                 __name = get_filed_name(line_list[1])
                 __value = line_list[3]
-                self.Data.update({unquote(to_str(__name)): unquote(to_str(__value))})
+                self.Data.update({unquote(to_str(__name)): unquote(to_str(__value))})  # noqa
 
     def __parse_form_urlencoded(self):
         for kv_entitry in self.Body.split(b"&"):
@@ -219,14 +232,58 @@ class Response:
     Code: int = 200
     Headers: dict = {}
     Body: str = ""
+    Cookies: Cookie = None
 
     def __init__(self, code: int = 200, headers: dict = None, body: t.Union[str, bytes] = ""):
         self.Code = code
         self.Headers = headers if headers else dict()
         self.Body = body
+        self.Cookies = Cookie()
+
+    def set_cookies(self,
+                    key,
+                    value='',
+                    max_age=None,
+                    expires=None,
+                    path='/',
+                    domain=None,
+                    secure=False,
+                    httponly=False,
+                    samesite=None):
+        """
+        set response cookie
+        """
+        self.Cookies[key] = value
+        self.Cookies[key].update({
+            "path": path,
+            "secure": secure,
+            "httponly": httponly,
+        })
+
+        if max_age:
+            self.Cookies[key].update({"max-age": max_age})
+        if expires:
+            self.Cookies[key].update({"expires": expires})
+        if domain:
+            self.Cookies[key].update({"domain": domain})
+        if samesite:
+            self.Cookies[key].update({"samesite": samesite})
 
 
 class Redirect(Response):
 
     def __init__(self, url: str):
         super().__init__(301, {"Location": url}, "")
+
+
+def make_response(body):
+    """
+    params: body # Response body
+    return: a Response object
+    """
+    if isinstance(body, (str, bytes)):
+        body=to_bytes(body)
+    if isinstance(body, dict):
+        body=to_bytes(json.dumps(body))
+
+    return Response(body=body)

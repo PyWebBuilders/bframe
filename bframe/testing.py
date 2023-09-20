@@ -29,19 +29,19 @@ class TestClient:
     def __init__(self, app) -> None:
         self.app = app
 
-    def handle(self, method, url, data=None):
-        r = Request(method, url)
+    def handle(self, method, url, data=None, headers=None):
+        r = Request(method, url, headers=headers)
         r.Data = data if data else {}
         return self.app(r)
 
-    def get(self, url):
-        return self.handle("GET", url)
+    def get(self, url, headers=None):
+        return self.handle("GET", url, headers=headers)
 
-    def post(self, url, data):
-        return self.handle("POST", url, data)
+    def post(self, url, data, headers=None):
+        return self.handle("POST", url, data, headers=headers)
 
-    def put(self, url, data):
-        return self.handle("PUT", url, data)
+    def put(self, url, data, headers=None):
+        return self.handle("PUT", url, data, headers=headers)
 
-    def delete(self, url, data):
-        return self.handle("DELETE", url, data)
+    def delete(self, url, data, headers=None):
+        return self.handle("DELETE", url, data, headers=headers)

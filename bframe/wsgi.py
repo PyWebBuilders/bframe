@@ -34,6 +34,7 @@ logger.module = __name__
 class WSGIProxy:
 
     def __init__(self, application):
+        logger.info("run mode: wsgi")
         self.application = application
 
     def response_status(self, code):
@@ -44,16 +45,22 @@ class WSGIProxy:
         if code in responses:
             return "%s %s" % (code, responses[code][0])
 
-    def response_headers(self, headers):
-        headers['Server'] = self.application.version
-        headers['Date'] = email.utils.formatdate(time.time(), usegmt=True)
-        ret = [(k, v) for k, v in headers.items()]
+    def response_cookies(self, response: Response):
+        ret = []
+        for cookie in response.Cookies.output():
+            ret.append(("Set-Cookie", cookie))
+        return ret
+
+    def response_headers(self, response: Response):
+        response.Headers['Server'] = self.application.version
+        response.Headers['Date'] = email.utils.formatdate(time.time(), usegmt=True)
+        ret = [(k, v) for k, v in response.Headers.items()]
+        ret.extend(self.response_cookies(response))
         return ret
 
     def wsgi_app(self,
                  environ: dict,
                  start_response: typing.Callable) -> typing.Any:
-        logger.info("run mode: wsgi")
         headers = {k[len("HTTP_"):].lower(): v for k,
                    v in environ.items() if k.startswith("HTTP")}
         headers.update({
@@ -77,7 +84,7 @@ class WSGIProxy:
 
         response: Response = self.application(req)
         start_response(self.response_status(response.Code),
-                       self.response_headers(response.Headers))
+                       self.response_headers(response))
 
         return [response.Body]
 

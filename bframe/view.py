@@ -56,7 +56,7 @@ class View:
 class MethodView(View):
 
     def dispatch(self, *args, **kwargs):
-        meth = getattr(self, request.method.lower(), self.notimpl_view)
+        meth = getattr(self, request.method.lower(), None)
 
         if meth is None and request.method == "HEAD":
             meth = getattr(self, "get", self.notimpl_view)

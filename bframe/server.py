@@ -24,11 +24,11 @@ SOFTWARE.
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from bframe.logger import __logger as logger
-from bframe.wrappers import Request, Response
+from bframe.wrappers import Cookie, Request, Response
 
 logger.module = __name__
 
-HTTP_METHOD = ["GET", "POST", "PUT", "DELETE"]
+HTTP_METHOD = ["HEAD", "GET", "POST", "PUT", "DELETE"]
 
 
 class SimpleHTTPServer(HTTPServer):
@@ -48,6 +48,9 @@ class SimpleHTTPServer(HTTPServer):
 
 
 class HTTPHandleMix:
+
+    def do_HEAD(self):
+        self.do_handle()
 
     def do_GET(self):
         self.do_handle()
@@ -75,7 +78,8 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
             req.parse_body(self.rfile.read(int(length)))
         try:
             res = self.server.application(req)
-        except Exception:   # noqa
+        except Exception as e:   # noqa
+            logger.warn("[do handle error]", e.args)
             res = Response(code=500,
                            body="Internal Server Error")
 
@@ -89,12 +93,18 @@ class SimpleRequestHandler(HTTPHandleMix, BaseHTTPRequestHandler):
         else:
             self.wfile.write(str(content).encode())
 
+    def send_cookies(self, m: Cookie):
+        for cookie in m.output():
+            self.send_header("Set-Cookie", cookie)
+
     def __send_response(self, r: Response):
         self.send_response_only(r.Code)
         self.send_header('Server', self.server.application.version)
         self.send_header('Date', self.date_time_string())
         for head, val in r.Headers.items():
             self.send_header(head, val)
+
+        self.send_cookies(r.Cookies)
 
         if r.Body:
             self.send_header("Content-Length", len(r.Body))

@@ -58,5 +58,21 @@ class LocalProxy:
         self.__name = name
 
     def __getattr__(self, name: str):
-        obj = getattr(self.__local, self.__name)
+        if callable(self.__local):
+            obj = self.__local(self.__name)
+        else:
+            obj = getattr(self.__local, self.__name)
         return getattr(obj, name)
+
+    def __setitem__(self, key, value):
+        if callable(self.__local):
+            obj = self.__local(self.__name)
+            obj[key] = value
+            return
+        self.__local[key] = value
+
+    def __getitem__(self, key):
+        if callable(self.__local):
+            obj = self.__local(self.__name)
+            return obj[key]
+        return self.__local[key]
