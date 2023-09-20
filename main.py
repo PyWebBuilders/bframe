@@ -4,6 +4,7 @@ import os
 from bframe import (Frame, MethodView, Redirect, abort, current_app, g,
                     make_response, request, session)
 from bframe.server import Response
+from bframe.generics import ViewSet
 
 app = Frame(__name__)
 # app.Config.from_py("config.py")
@@ -173,8 +174,40 @@ class BookView(MethodView):
         return req
 
 
+class PhoneViewSet(ViewSet):
+    pass
+
+   # def list(self):
+   #     return "list"
+
+   # def create(self):
+   #     return "create"
+
+   # def retrieve(self, pk=None):
+   #     return f"retrieve {pk}"
+
+   # def update(self, pk=None):
+   #     return f"update {pk}"
+
+   # def partial_update(self, pk=None):
+   #     return f"partial_update {pk}"
+
+   # def destroy(self, pk=None):
+   #     return f"destroy {pk}"
+
+
 app.add_route("/detail", Detail.as_view())
 app.add_route("/book", BookView.as_view())
+app.add_route("/phone", PhoneViewSet.as_view({
+    "get": "list",
+    "post": "create",
+}))
+app.add_route("/phone/<int:pk>", PhoneViewSet.as_view({
+    "get": "retrieve",
+    "post": "update",
+    "put": "partial_update",
+    "delete": "destroy",
+}))
 
 
 if __name__ == "__main__":
