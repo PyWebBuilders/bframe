@@ -1,0 +1,46 @@
+site_name: bframe
+site_url: https://github.com/Bean-jun/bframe
+repo_url: https://github.com/Bean-jun/bframe
+nav:
+  - 主页: index.md
+  - API: api.md
+theme:
+  name: material
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.path
+    - header.autohide
+    - navigation.footer
+    - content.code.copy
+    - content.code.select
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+plugins:
+  - search
+  - mkdocstrings
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/Bean-jun
+copyright: Copyright &copy; 2023 - 2023 Bean-jun
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences

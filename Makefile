@@ -6,3 +6,7 @@ test-report:
 
 build: test
 	@build
+
+build-docs:
+	copy README.md docs\\index.md
+	@mkdocs build
