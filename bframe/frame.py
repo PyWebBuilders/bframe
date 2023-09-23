@@ -118,7 +118,7 @@ class Frame(Scaffold):
     def dispatch(self, r: Request):
         ctx = RequestCtx(r, self)
         with ctx:
-            self.Logger.debug(req.method, req.path + "?"+"&".join([f"{k}={v}" for k, v in req.args.items()]))
+            self.Logger.debug(req.method, req.full_path)
             # ctx.push()    # 自动push
             self.Session.open_session()
             try:
