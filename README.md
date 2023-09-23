@@ -5,17 +5,10 @@
 > `wranning`: same flask, not flask!
 
 
-### 1. 快速安装使用
+### 1. 安装
 
 ```shell
-pip install bframe -i https://pypi.org/simple
-```
-
-or 
-
-```shell
-git clone https://github.com/Bean-jun/bframe.git
-python setup.py install
+pip install -U bframe
 ```
 
 ### 2. 快速入门
@@ -27,7 +20,6 @@ app = Frame(__name__)
 
 
 @app.get("/")
-@app.get("/index")
 def home():
     return "hello world"
 

@@ -31,7 +31,7 @@ class GenericView(View):
     @classmethod
     def as_view(cls, action, *class_args, **class_kwargs):
         def view(*args, **kwds):
-            self = view.view_class(*class_args, **class_kwargs)
+            self = view.view_class(*class_args, **class_kwargs)     #noqa
             self.action = action
             return self.dispatch(*args, **kwds)
 
@@ -88,7 +88,7 @@ class GenericAPIView(GenericView):
         return self.table_serializer
 
     def get_session(self):
-        raise
+        raise NotImplementedError
 
     def get_table_filter_kwargs(self):
         """获取请求过滤字段"""
@@ -264,20 +264,20 @@ class RetrieveUpdateAPI(GenericAPIView,
     pass
 
 
-class RetrieveDestoryAPI(GenericAPIView,
+class RetrieveDestroyAPI(GenericAPIView,
                          RetrieveMixAPI,
                          DestroyMixAPI):
     pass
 
 
-class RetrieveUpdateDestoryAPI(GenericAPIView,
+class RetrieveUpdateDestroyAPI(GenericAPIView,
                                RetrieveMixAPI,
                                UpdateMixAPI,
                                DestroyMixAPI):
     pass
 
 
-class RetrieveUpdatePatchDestoryAPI(GenericAPIView,
+class RetrieveUpdatePatchDestroyAPI(GenericAPIView,
                                     RetrieveMixAPI,
                                     UpdateMixAPI,
                                     PatchMixAPI,

@@ -67,9 +67,9 @@ class DatetimeSerializer(SimpleSerializer):
     """日期时间序列化器"""
 
     def cure_value(self, value):
-        if isinstance(value, (datetime.date)):
+        if isinstance(value, datetime.date):
             return value.strftime("%Y-%m-%d")
-        if isinstance(value, (datetime.datetime)):
+        if isinstance(value, datetime.datetime):
             return value.strftime("%Y-%m-%d %H:%M:%S")
         return str(value)
 
