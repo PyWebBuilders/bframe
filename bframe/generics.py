@@ -93,25 +93,22 @@ class GenericAPIView(GenericView):
     def get_table_filter_kwargs(self):
         """获取请求过滤字段"""
         kw = dict()
-        table = self.get_table
         for key, value in request.args.items():
-            if hasattr(table, key):
+            if hasattr(self.get_table, key):
                 kw[key] = value
         return kw
 
     def get_table_body_kwargs(self):
         """获取请求体过滤字段"""
         kw = dict()
-        table = self.get_table
         for key, value in request.forms.items():
-            if hasattr(table, key):
+            if hasattr(self.get_table, key):
                 kw[key] = value
         return kw
 
     def get_table_filter_by_pk(self, pk, pk_key="pk"):
-        table = self.get_table
-        if not hasattr(table, pk_key):
-            raise Exception(f"{table.__class__.__name__} not {pk_key} attr")
+        if not hasattr(self.get_table, pk_key):
+            raise Exception(f"{self.get_table.__class__.__name__} not {pk_key} attr")
         return {pk_key: pk}
 
     def get_table_order_by_kwargs(self):
@@ -140,17 +137,15 @@ class GenericAPIView(GenericView):
 
     def make_condition(self, kwargs):
         condition = []
-        table = self.get_table
         for k, v in kwargs.items():
-            condition.append(getattr(table, k) == v)
+            condition.append(getattr(self.get_table, k) == v)
         return condition
 
     def make_order(self, kwargs):
         orders = []
-        table = self.get_table
         for k, v in kwargs.items():
-            if hasattr(table, k):
-                orders.append(getattr(getattr(table, k), v)())
+            if hasattr(self.get_table, k):
+                orders.append(getattr(getattr(self.get_table, k), v)())
         return orders
 
     def to_serializer(self, objs, count=0):
@@ -161,12 +156,11 @@ class GenericAPIView(GenericView):
 class ListMixAPI:
 
     def list(self):
-        table = self.get_table
         filter_kwargs = self.get_table_filter_kwargs()
         order_by_kwargs = self.get_table_order_by_kwargs()
         limit, offset = self.get_table_limit_by_kwargs()
 
-        query = self.get_session().query(table).filter(*self.make_condition(filter_kwargs)).\
+        query = self.get_session().query(self.get_table).filter(*self.make_condition(filter_kwargs)).\
             order_by(*self.make_order(order_by_kwargs))
         count = query.count()
         objs = query.limit(limit).offset((offset-1)*limit).all()
@@ -176,10 +170,9 @@ class ListMixAPI:
 class CreateMixAPI:
 
     def create(self):
-        table = self.get_table
         session = self.get_session()
         body_kwargs = self.get_table_body_kwargs()
-        obj = table(**body_kwargs)
+        obj = self.get_table(**body_kwargs)
         session.add(obj)
         session.commit()
         return self.to_serializer(obj, 1)
@@ -188,10 +181,9 @@ class CreateMixAPI:
 class RetrieveMixAPI:
 
     def retrieve(self, pk):
-        table = self.get_table
         filter_kwargs = self.get_table_filter_by_pk(pk,
                                                     self.table_class_primary_key)
-        query = self.get_session().query(table).filter(
+        query = self.get_session().query(self.get_table).filter(
             *self.make_condition(filter_kwargs))
         obj = query.first()
         if obj is None:
@@ -203,11 +195,10 @@ class RetrieveMixAPI:
 class UpdateMixAPI:
 
     def update(self, pk):
-        table = self.get_table
         filter_kwargs = self.get_table_filter_by_pk(pk,
                                                     self.table_class_primary_key)
         session = self.get_session()
-        obj = session.query(table).filter(
+        obj = session.query(self.get_table).filter(
             *self.make_condition(filter_kwargs)).first()
         if obj is None:
             return abort(404)
@@ -220,11 +211,10 @@ class UpdateMixAPI:
 class PatchMixAPI:
 
     def partial_update(self, pk):
-        table = self.get_table
         filter_kwargs = self.get_table_filter_by_pk(pk,
                                                     self.table_class_primary_key)
         session = self.get_session()
-        obj = session.query(table).filter(
+        obj = session.query(self.get_table).filter(
             *self.make_condition(filter_kwargs)).first()
         if obj is None:
             return abort(404)
@@ -237,11 +227,10 @@ class PatchMixAPI:
 class DestroyMixAPI:
 
     def destroy(self, pk):
-        table = self.get_table
         session = self.get_session()
         filter_kwargs = self.get_table_filter_by_pk(pk,
                                                     self.table_class_primary_key)
-        query = self.get_session().query(table).filter(
+        query = session.query(self.get_table).filter(
             *self.make_condition(filter_kwargs))
         count = query.count()
         obj = query.first()
