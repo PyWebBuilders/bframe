@@ -35,7 +35,6 @@ from bframe.utils import parse_except_code
 from bframe.utils import to_bytes
 from bframe.utils import abort
 from bframe.sessions import SessionMix
-from bframe.sessions import SESSION_ID
 from bframe.sessions import MemorySession
 
 
@@ -46,8 +45,7 @@ class Frame(Scaffold):
     error_funs_dict = dict()
 
     # 会话消息
-    SessionID: str = SESSION_ID
-    Session: SessionMix = MemorySession(key=SESSION_ID)
+    Session: SessionMix = MemorySession()
 
     # 序列化
     Serializer = json

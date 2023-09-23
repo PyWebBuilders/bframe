@@ -11,6 +11,7 @@ from bframe.server import Response
 from bframe.generics import ViewSet
 
 app = Frame(__name__)
+app.Config["SESSION_ID"] = "pysession"
 # app.Config.from_py("config.py")
 
 
@@ -222,8 +223,8 @@ class PhoneViewSet(ViewSet):
     def get_session(self):
         return session
 
-   # def list(self):
-   #     return "list"
+    def list(self):
+        return "list"
 
    # def create(self):
    #     return "create"

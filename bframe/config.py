@@ -25,7 +25,31 @@ import importlib
 from collections import UserDict
 
 
-class Config(UserDict):
+DEFAULT_CONFIG = {
+    # SESSION CONFIG
+    "SESSION_ID": "_session",
+    "SESSION_MAX_AGE": 604800,  # a week
+    "SESSION_EXPIRES": None,
+    "SESSION_PATH": "/",
+    "SESSION_DOMAIN": None,
+    "SESSION_SECURE": False,
+    "SESSION_HTTPONLY": True,
+    "SESSION_SAMESITE": None,
+}
+
+
+class BaseConfig(UserDict):
+
+    def __init__(self, dict=None, /, **kwargs):
+        super().__init__(dict, **kwargs)
+        self.__initialize_default_config(DEFAULT_CONFIG)
+
+    def __initialize_default_config(self, kwargs: dict):
+        for key, value in kwargs.items():
+            self.data[key] = value
+
+
+class Config(BaseConfig):
 
     def from_py(self, path: str):
         if path.endswith(".py"):
