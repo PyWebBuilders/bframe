@@ -12,6 +12,5 @@ tutorial/bframer/bframer.db
 *.db
 .cache/
 site/
-docs/index.md
 favicon.ico
 !docs/favicon.ico

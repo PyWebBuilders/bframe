@@ -2,9 +2,12 @@ site_name: bframe
 site_url: https://github.com/Bean-jun/bframe
 repo_url: https://github.com/Bean-jun/bframe
 nav:
-  - Home: index.md
+  - 主页: index.md
+  - 安装: installation.md
+  - 快速入门: quickstart.md
+  - 教程: tutorial.md
   - API: api.md
-  - Changes: changes.md
+  - 版本: changes.md
 theme:
   name: material
   favicon: favicon.ico
