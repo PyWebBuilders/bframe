@@ -21,12 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-from bframe import request
+from bframe import abort, current_app, request
 from bframe.view import View
-from bframe import abort
 
 
 class GenericView(View):
+    config_prefix = "GENERIC_VIEW_"
 
     @classmethod
     def as_view(cls, action, *class_args, **class_kwargs):
@@ -45,6 +45,12 @@ class GenericView(View):
         view.method = cls.method
         return view
 
+    def initlization_params(self):
+        for key, value in current_app.Config.items():
+            if key.startswith(self.config_prefix):
+                _key = key[len(self.config_prefix):]
+                setattr(self, _key.lower(), value)
+    
     def dispatch(self, *args, **kwargs):
         action_str = self.action.get(request.method.lower())
         if action_str is None and request.method == "HEAD":
@@ -52,22 +58,24 @@ class GenericView(View):
 
         meth = action_str and getattr(self, action_str) or self.notimpl_view
 
+        self.initlization_params()
         return meth(*args, **kwargs)
 
 
 class GenericAPIView(GenericView):
 
     table_class = None                          # 模型表
-    table_class_primary_key = "id"              # 模型表主键
     table_serializer = None                     # 模型序列化类
-    default_limit = 20                          # 默认查询总量
-    default_limit_key = "_limit"                # 默认查询总量key
-    default_offset = 1                          # 默认分页数
-    default_offset_key = "_offset"              # 默认分页数key
-    default_order_by = table_class_primary_key  # 数据查询排序字段
-    default_order_by_key = "_order_by"          # 数据查询排序字段key
-    default_order = "asc"                       # 数据查询排序字段顺序
-    default_order_key = "_order"                # 数据查询排序字段顺序key
+    
+    default_primary_key = None                  # 模型表主键
+    default_limit = None                        # 默认查询总量
+    default_limit_key = None                    # 默认查询总量key
+    default_offset = None                       # 默认分页数
+    default_offset_key = None                   # 默认分页数key
+    default_order_by = None                     # 数据查询排序字段
+    default_order_by_key = None                 # 数据查询排序字段key
+    default_order = None                        # 数据查询排序字段顺序
+    default_order_key = None                    # 数据查询排序字段顺序key
 
     @property
     def get_table(self):
@@ -182,7 +190,7 @@ class RetrieveMixAPI:
 
     def retrieve(self, pk):
         filter_kwargs = self.get_table_filter_by_pk(pk,
-                                                    self.table_class_primary_key)
+                                                    self.default_primary_key)
         query = self.get_session().query(self.get_table).filter(
             *self.make_condition(filter_kwargs))
         obj = query.first()
@@ -196,7 +204,7 @@ class UpdateMixAPI:
 
     def update(self, pk):
         filter_kwargs = self.get_table_filter_by_pk(pk,
-                                                    self.table_class_primary_key)
+                                                    self.default_primary_key)
         session = self.get_session()
         obj = session.query(self.get_table).filter(
             *self.make_condition(filter_kwargs)).first()
@@ -212,7 +220,7 @@ class PatchMixAPI:
 
     def partial_update(self, pk):
         filter_kwargs = self.get_table_filter_by_pk(pk,
-                                                    self.table_class_primary_key)
+                                                    self.default_primary_key)
         session = self.get_session()
         obj = session.query(self.get_table).filter(
             *self.make_condition(filter_kwargs)).first()
@@ -229,7 +237,7 @@ class DestroyMixAPI:
     def destroy(self, pk):
         session = self.get_session()
         filter_kwargs = self.get_table_filter_by_pk(pk,
-                                                    self.table_class_primary_key)
+                                                    self.default_primary_key)
         query = session.query(self.get_table).filter(
             *self.make_condition(filter_kwargs))
         count = query.count()
