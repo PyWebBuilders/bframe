@@ -107,3 +107,121 @@ app = Frame(__name__, static_url="static", static_folder="static")
 ```python
 app.Config.from_py("config")
 ```
+
+### 支持cookie&session操作
+
+```python
+from bframe import Frame
+from bframe import make_response
+from bframe import session
+
+app = Frame(__name__)
+
+@app.get("/")
+def index():
+    ret = make_response("hello world")
+    sess["username"] = "tom"
+    ret.set_cookies("x-username", "tom", path="/")
+    return ret
+
+
+@app.get("/home")
+def home():
+    username = sess["username"]
+    if not username:
+        return "not login"
+    print(request.Cookies.get("x-username"))
+    ret = make_response("home")
+    return ret
+
+
+if __name__ == "__main__":
+    app.run()
+```
+
+### 支持类视图
+
+```python
+from bframe import MethodView
+
+app = Frame(__name__)
+
+class BookView(MethodView):
+
+    def get(self):
+        return books
+
+    def post(self):
+        global books
+        req = request.forms
+        req['id'] = len(books) + 1
+        books.append(req)
+        return req
+
+
+app.add_route("/book", BookView.as_view())
+
+
+if __name__ == "__main__":
+    app.run()
+```
+
+### 支持通用类视图&默认路由
+
+```python
+from bframe.serizlizer import SimpleSerializer
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base
+
+
+engine = create_engine('sqlite:///database.db', echo=True)
+Base = declarative_base()
+
+
+class Phone(Base):
+    __tablename__ = 'phones'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    price = Column(Float)
+
+
+# Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+
+
+class PhoneViewSet(ViewSet):
+    decorators = [prue_response_decorator]
+    table_class = Phone
+    table_serializer = SimpleSerializer
+
+    def get_session(self):
+        return session
+
+
+
+# ================================
+app.add_route("/phone", PhoneViewSet.as_view({
+    "get": "list",
+    "post": "create",
+}))
+app.add_route("/phone/<int:pk>", PhoneViewSet.as_view({
+    "get": "retrieve",
+    "post": "update",
+    "put": "partial_update",
+    "delete": "destroy",
+}))
+# 或者================================
+from bframe.generics import DefaultRouter
+
+router = DefaultRouter(app)
+# PhoneViewSet
+router.register("/phone", PhoneViewSet)
+
+
+if __name__ == "__main__":
+    app.run()
+```
