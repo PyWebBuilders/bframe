@@ -41,6 +41,7 @@ bframe的使用比较简单，相比更为复杂的`django`，您可以直接尝
 
 - [版本](changes.md)
 
+    - [Version 0.0.15](changes.md#version-0015)
     - [Version 0.0.14](changes.md#version-0014)
     - [Version 0.0.13](changes.md#version-0013)
     - [Version 0.0.12](changes.md#version-0012)
