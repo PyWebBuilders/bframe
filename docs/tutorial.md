@@ -225,3 +225,28 @@ router.register("/phone", PhoneViewSet)
 if __name__ == "__main__":
     app.run()
 ```
+
+### 框架默认配置
+
+```shell
+# session相关的默认配置
+"SESSION_ID": "_session"
+"SESSION_MAX_AGE": 604800  # a week
+"SESSION_EXPIRES": None
+"SESSION_PATH": "/"
+"SESSION_DOMAIN": None
+"SESSION_SECURE": False
+"SESSION_HTTPONLY": True
+"SESSION_SAMESITE": None
+
+# 通用视图默认配置
+"GENERIC_VIEW_DEFAULT_PRIMARY_KEY": "id"                  # 数据库主键名称
+"GENERIC_VIEW_DEFAULT_LIMIT": 20                          # 默认查询总量
+"GENERIC_VIEW_DEFAULT_LIMIT_KEY": "_limit"                # 默认查询总量key
+"GENERIC_VIEW_DEFAULT_OFFSET": 1                          # 默认分页数
+"GENERIC_VIEW_DEFAULT_OFFSET_KEY": "_offset"              # 默认分页数key
+"GENERIC_VIEW_DEFAULT_ORDER_BY": "id"                     # 数据查询排序字段
+"GENERIC_VIEW_DEFAULT_ORDER_BY_KEY": "_order_by"          # 数据查询排序字段key
+"GENERIC_VIEW_DEFAULT_ORDER": "asc"                       # 数据查询排序字段顺序
+"GENERIC_VIEW_DEFAULT_ORDER_KEY": "_order"                # 数据查询排序字段顺序key
+```

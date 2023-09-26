@@ -31,8 +31,13 @@ bframe的使用比较简单，相比更为复杂的`django`，您可以直接尝
     - [支持路径参数匹配](tutorial.md#支持路径参数匹配字符串数字正则)
     - [支持静态文件](tutorial.md#支持静态文件)
     - [支持解析py配置文件](tutorial.md#支持解析py配置文件)
+    - [支持类视图](tutorial.md#支持类视图)
+    - [支持通用类视图&默认路由](tutorial.md#支持通用类视图默认路由)
+    - [框架默认配置](tutorial.md#框架默认配置)
 
 - [API](api.md)
+
+    - [结构树](api.md#结构树)
 
 - [版本](changes.md)
 
