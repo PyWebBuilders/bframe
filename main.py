@@ -1,11 +1,17 @@
+from bframe.serizlizer import SimpleSerializer
+from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base
 import functools
 import os
 
 from bframe import (Frame, MethodView, Redirect, abort, current_app, g,
                     make_response, request, session)
 from bframe.server import Response
+from bframe.generics import ViewSet
 
 app = Frame(__name__)
+app.Config["SESSION_ID"] = "pysession"
 # app.Config.from_py("config.py")
 
 
@@ -173,8 +179,86 @@ class BookView(MethodView):
         return req
 
 
+engine = create_engine('sqlite:///database.db', echo=True)
+Base = declarative_base()
+
+
+class Phone(Base):
+    __tablename__ = 'phones'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    price = Column(Float)
+
+
+# Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# phone1 = Phone(name='huawei', price=10.1)
+# phone2 = Phone(name='apple', price=12.01)
+# phone3 = Phone(name='xiaomi', price=21.01)
+# phone4 = Phone(name='vivo', price=1.02)
+# session.add_all([phone1, phone2, phone3, phone4])
+# session.commit()
+
+
+def prue_response_decorator(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        response = f(*args, **kwargs)
+        return {
+            "msg": "ok",
+            "status": True,
+            "data": response,
+        }
+    return wrapper
+
+
+class PhoneViewSet(ViewSet):
+    decorators = [prue_response_decorator]
+    table_class = Phone
+    table_serializer = SimpleSerializer
+
+    def get_session(self):
+        return session
+
+    def list(self):
+        return "list"
+
+   # def create(self):
+   #     return "create"
+
+   # def retrieve(self, pk=None):
+   #     return f"retrieve {pk}"
+
+   # def update(self, pk=None):
+   #     return f"update {pk}"
+
+   # def partial_update(self, pk=None):
+   #     return f"partial_update {pk}"
+
+   # def destroy(self, pk=None):
+   #     return f"destroy {pk}"
+
+
 app.add_route("/detail", Detail.as_view())
 app.add_route("/book", BookView.as_view())
+
+from bframe.generics import DefaultRouter
+
+router = DefaultRouter(app)
+router.register("/phone", PhoneViewSet)
+# app.add_route("/phone", PhoneViewSet.as_view({
+#     "get": "list",
+#     "post": "create",
+# }))
+# app.add_route("/phone/<int:pk>", PhoneViewSet.as_view({
+#     "get": "retrieve",
+#     "post": "update",
+#     "put": "partial_update",
+#     "delete": "destroy",
+# }))
 
 
 if __name__ == "__main__":

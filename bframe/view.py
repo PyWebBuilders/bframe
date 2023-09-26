@@ -29,6 +29,7 @@ from bframe.server import HTTP_METHOD
 class View:
     method = HTTP_METHOD
     decorators = list()
+    action = dict()
     notimpl_view = lambda *a, **kw: abort(404)
 
     def dispatch(self, *args, **kwargs):

@@ -57,7 +57,9 @@ class FrameTestCase(unittest.TestCase):
     
     def test_config_01(self):
         response = self.client.get("/conf")
-        self.assertEqual(json.loads(response.Body), {"HOST": "0.0.0.0", "PORT": 7256}, "响应数据异常")
+        body = json.loads(response.Body)
+        self.assertEqual(body["HOST"],  "0.0.0.0", "响应数据异常")
+        self.assertEqual(body["PORT"], 7256, "响应数据异常")
     
     def test_class_UserInfo_01(self):
         response = self.client.get("/userinfo")

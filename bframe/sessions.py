@@ -25,24 +25,26 @@ import pickle
 import time
 import uuid
 
-from bframe import request
+from bframe import current_app, request
 from bframe.logger import __logger as logger
 from bframe.wrappers import Response
 
 logger.module = __name__
 
-SESSION_ID = "_session"
-
 
 class SessionMix:
 
     def __init__(self, key=None):
-        self.session_id = key or SESSION_ID
+        self.session_id = key
+
+    @property
+    def get_session_key_name(self):
+        return self.session_id or current_app.Config.get("SESSION_ID")
 
     def parse_session_id(self):
-        if self.session_id not in request.Cookies.keys():
+        if self.get_session_key_name not in request.Cookies.keys():
             return None
-        return request.Cookies[self.session_id].value
+        return request.Cookies[self.get_session_key_name].value
 
     def create_session_key(self):
         session_key = str(uuid.uuid4()) + str(time.time())
@@ -52,13 +54,23 @@ class SessionMix:
         session_key = self.parse_session_id()
         logger.info(f"open session, parse session key {session_key}")
         if not session_key or not self.has_storage(session_key):
-            logger.info(f"open session, not has_storage session key {session_key}")
+            logger.info(
+                f"open session, not has_storage session key {session_key}")
             session_key = self.create_session_key()
         request.session = session_key
         logger.info(f"open session, session key {session_key}")
 
     def save_session(self, resp: Response):
-        resp.set_cookies(self.session_id, request.session, httponly=True, max_age=604800)
+        resp.set_cookies(self.get_session_key_name,
+                         request.session,
+                         max_age=current_app.Config.get("SESSION_MAX_AGE"),
+                         expires=current_app.Config.get("SESSION_EXPIRES"),
+                         path=current_app.Config.get("SESSION_PATH"),
+                         domain=current_app.Config.get("SESSION_DOMAIN"),
+                         secure=current_app.Config.get("SESSION_SECURE"),
+                         httponly=current_app.Config.get("SESSION_HTTPONLY"),
+                         samesite=current_app.Config.get("SESSION_SAMESITE"),
+                         )
         logger.info("save session")
 
     def has_storage(self, session_key):
@@ -114,10 +126,10 @@ class SimpleRedisSession(SessionMix):
                                  decode_responses=redis_decode_responses)
 
     def _get_key_by_request(self):
-        return "%s_%s" % (SESSION_ID, request.session)
+        return "%s_%s" % (self.get_session_key_name, request.session)
 
     def _get_key(self, key):
-        return "%s_%s" % (SESSION_ID, key)
+        return "%s_%s" % (self.get_session_key_name, key)
 
     # def _dump_object(self, k):
     #     return pickle.dumps(k) if k is not None else k

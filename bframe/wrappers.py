@@ -62,6 +62,7 @@ class BaseFile:
 class BaseRequest:
     Method: str = ""
     Path: str = ""
+    Full_Path: str = ""
     Args: dict = {}
     Protoc: str = ""
     Headers: dict = {}
@@ -78,6 +79,7 @@ class BaseRequest:
                  headers: dict = None):
         self.__initialize_args()
         self.Method = method
+        self.Full_Path = path
         if "?" in path:
             self.Path, self.Args = BaseRequest.__initialize_path(path)
         else:
@@ -224,6 +226,10 @@ class Request(BaseRequest):
         return self.Path
 
     @property
+    def full_path(self):
+        return self.Full_Path
+
+    @property
     def headers(self):
         return self.Headers
 
@@ -282,8 +288,8 @@ def make_response(body):
     return: a Response object
     """
     if isinstance(body, (str, bytes)):
-        body=to_bytes(body)
+        body = to_bytes(body)
     if isinstance(body, dict):
-        body=to_bytes(json.dumps(body))
+        body = to_bytes(json.dumps(body))
 
     return Response(body=body)

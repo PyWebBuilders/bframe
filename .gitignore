@@ -9,3 +9,8 @@ reports/
 static/
 tutorial/bframer/bframer.db
 !tutorial/bframer/static
+*.db
+.cache/
+site/
+favicon.ico
+!docs/favicon.ico

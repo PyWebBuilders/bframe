@@ -6,3 +6,6 @@ test-report:
 
 build: test
 	@build
+
+build-docs:
+	@mkdocs build
