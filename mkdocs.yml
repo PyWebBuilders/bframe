@@ -7,6 +7,7 @@ nav:
   - 快速入门: quickstart.md
   - 教程: tutorial.md
   - API: api.md
+  - TODO: todo.md
   - 版本: changes.md
 theme:
   name: material
