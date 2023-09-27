@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "site"
+		},
+		{
+			"path": "tutorial"
+		},
+		{
+			"path": "docs"
+		}
+	],
+	"settings": {
+		"python.pythonPath": ".idea\\Scripts\\python.exe"
+	}
+}

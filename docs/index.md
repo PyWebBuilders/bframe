@@ -18,8 +18,8 @@ bframe的使用比较简单，相比更为复杂的`django`，您可以直接尝
 
 - [快速入门](quickstart.md)
 
-    - [bframer](quickstart.md#bframer)
-    - [shortUrl](quickstart.md#shorturl)
+    - [polls投票应用](quickstart.md#polls)
+    - [其他](quickstart.md#其他)
 
 - [教程](tutorial.md)
 
