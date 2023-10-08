@@ -26,10 +26,10 @@ import time
 import uuid
 
 from bframe import current_app, request
-from bframe.logger import __logger as logger
+from bframe.logger import init_logger
 from bframe.wrappers import Response
 
-logger.module = __name__
+logger = init_logger()
 
 
 class SessionMix:

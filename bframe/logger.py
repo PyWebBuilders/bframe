@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import datetime
+import inspect
 import os
 import sys
 from typing import TextIO
@@ -36,35 +37,27 @@ WARN = 0x2  # warn
 class BaseLogger:
 
     def __init__(self,
-                 module,
                  level: int = INFO,
                  write_file: bool = False,
                  log_file: str = "log.log",
                  out: TextIO = sys.stdout):
-        self.__module = module
         self.level = level
         self.write_file = write_file
         archive_file(os.getcwd(), log_file)
         if self.write_file:
             self.log = open(log_file, "a", encoding="utf-8")
         self.out = out
-
-    @property
-    def module(self):
-        return self.__module
-
-    @module.setter
-    def module(self, module):
-        self.__module = module
+        self._prefix = os.path.dirname(os.path.abspath(__file__)) + os.sep
 
     def write(self, level, *msg):
-        _msg = "[%s] - [%s] %s\n" % (str(datetime.datetime.now()),
-                                     self.module, " ".join([str(m) for m in msg]))  # noqa
+        stack = inspect.stack()[2]
+        _msg = "[%s] - [%s:%d] %s\n" % (str(datetime.datetime.now()),
+                                     stack[1][len(self._prefix):], stack[2], " ".join([str(m) for m in msg]))  # noqa
         if level >= self.level:
             if self.write_file:
                 self.log.write(_msg)
                 self.log.flush()
-        self.out.write(_msg)
+            self.out.write(_msg)
 
     def info(self, *msg):
         self.write(INFO, *msg)
@@ -80,8 +73,8 @@ class Logger(BaseLogger):
     pass
 
 
-def init_logger(module) -> Logger:
-    return Logger(module)
+def init_logger(level=DEBUG) -> Logger:
+    return Logger(level)
 
 
-__logger: Logger = init_logger(__name__)
+# __logger: Logger = init_logger()

@@ -26,9 +26,9 @@ import time
 from http import HTTPStatus
 import typing
 from bframe.server import Request, Response
-from bframe.logger import __logger as logger
+from bframe.logger import init_logger
 
-logger.module = __name__
+logger = init_logger()
 
 
 class WSGIProxy:

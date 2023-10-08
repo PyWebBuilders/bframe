@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from threading import get_ident
-from bframe.logger import __logger as logger
+from bframe.logger import init_logger
 
-logger.module = __name__
+logger = init_logger()
 
 
 class Local:

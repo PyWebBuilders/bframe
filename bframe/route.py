@@ -25,9 +25,9 @@ import re
 from typing import Callable, List, TypeVar, Union
 
 from bframe._except import NoSetControllerException, ReqRepeatException
-from bframe.logger import __logger as logger
+from bframe.logger import init_logger
 
-logger.module = __name__
+logger = init_logger()
 
 
 AnyPath = TypeVar('AnyPath', int, str)
