@@ -28,6 +28,7 @@ import sys
 from typing import TextIO
 
 from bframe.utils import archive_file
+from bframe.utils import color_msg, TEXT, BACK, STYLE
 
 INFO = 0x0  # info
 DEBUG = 0x1  # debug
@@ -57,6 +58,12 @@ class BaseLogger:
             if self.write_file:
                 self.log.write(_msg)
                 self.log.flush()
+            if level == INFO:
+                _msg = color_msg(_msg, TEXT.WHITE)
+            if level == DEBUG:
+                _msg = color_msg(_msg, TEXT.YELLOW)
+            if level == WARN:
+                _msg = color_msg(_msg, TEXT.RED)
             self.out.write(_msg)
 
     def info(self, *msg):
