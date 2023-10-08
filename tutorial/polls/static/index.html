@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap/5.1.3/css/bootstrap.css" type="text/css"
+    rel="stylesheet" />
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap/5.1.3/js/bootstrap.js"
+    type="application/javascript"></script>
+  <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/axios/0.26.0/axios.js"
+    type="application/javascript"></script>
+  <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.js"
+    type="application/javascript"></script>
+  <link rel="stylesheet" href="main.css">
+  <title>polls</title>
+</head>
+
+<body>
+  <div id="app">
+    <div class="container-fluid">
+      <div id="login" v-if="showLogin">
+        <div id="login-form">
+          <form action="#">
+            <h1 style="text-align: center;">登 录</h1>
+            <div class="mb-3 row">
+              <label for="username-id" class="col-sm-2 col-form-label">用户名</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="username-id" placeholder="请填写用户名" v-model="username">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="password-id" class="col-sm-2 col-form-label">密 码</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="password-id" placeholder="请填写密码" v-model="password">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <div class="col-sm-6">
+                <input @click="LoginHandle" type="button" class="form-control" id="submit-id" value="登 录">
+              </div>
+              <div class="col-sm-6">
+                <input @click="RegisterHandle" type="button" class="form-control" id="submit-id" value="注 册">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div id="register" v-if="showRegister">
+        <div id="login-form">
+          <form action="#">
+            <h1 style="text-align: center;">注 册</h1>
+            <div class="mb-3 row">
+              <label for="username-id" class="col-sm-2 col-form-label">用户名</label>
+              <div class="col-sm-10">
+                <input type="text" class="form-control" id="username-id" placeholder="请填写用户名" v-model="username">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <label for="password-id" class="col-sm-2 col-form-label">密 码</label>
+              <div class="col-sm-10">
+                <input type="password" class="form-control" id="password-id" placeholder="请填写密码" v-model="password">
+              </div>
+            </div>
+            <div class="mb-3 row">
+              <div class="col-sm-6">
+                <input @click="LoginHandle" type="button" class="form-control" id="submit-id" value="登 录">
+              </div>
+              <div class="col-sm-6">
+                <input @click="RegisterHandle" type="button" class="form-control" id="submit-id" value="注 册">
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      </div>
+      <div id="polls" v-if="showPolls">polls</div>
+    </div>
+  </div>
+  <script src="/main.js"></script>
+</body>
+
+</html>

@@ -1,8 +1,9 @@
 from bframe import Frame
+from bframe import Redirect
 
 
 def create_app(config):
-    app = Frame(__name__)
+    app = Frame(__name__, static_url="")
     # 加载配置文件
     app.Config.from_py(config)
 
@@ -28,6 +29,12 @@ def create_app(config):
     @app.get("/ping")
     def pong():
         return "pong"
+    
+    @app.get("/")
+    @app.get("/index")
+    def index():
+        return Redirect("/index.html")
+
     return app
 
 
