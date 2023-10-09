@@ -16,6 +16,11 @@ new Vue({
         this.GetQuestionsHandle();
         this.GetQuestionsChoiceHandle();
     },
+    watch: {
+        cursor: function (e) {
+            this.GetQuestionsChoiceHandle();
+        }
+    },
     methods: {
         CheckLogin: function () {
             that = this;
@@ -23,7 +28,7 @@ new Vue({
                 method: 'get',
                 url: location.origin + '/questions',
                 responseType: 'json'
-            }).then(function(response){
+            }).then(function (response) {
                 if (response.data === "no login") {
                     that.showLogin = true;
                     that.showRegister = false;
@@ -43,17 +48,32 @@ new Vue({
                 that.questionCount = response.data.count;
             });
         },
-        GetQuestionsChoiceHandle: function(){
+        GetQuestionsChoiceHandle: function () {
             that = this;
             axios({
                 method: 'get',
-                url: location.origin + `/choices?question=${this.cursor+1}`,
+                url: location.origin + `/choices?question=${this.cursor + 1}`,
                 responseType: 'json'
             }).then(function (response) {
                 that.choiceData = response.data.list;
             });
         },
-        LoginHandle: function(){
+        CommitChoiceHandle: function (id) {
+            that = this;
+            axios({
+                method: 'post',
+                url: location.origin + `/user_choices`,
+                data: {
+                    choiceid: id,
+                },
+                responseType: 'json'
+            }).then(function (response) {
+                that.choiceData = response.data.list;
+                that.cursor = that.cursor + 1 >= that.questionCount ? 0 : that.cursor + 1;
+            });
+
+        },
+        LoginHandle: function () {
             this.showLogin = true;
             this.showRegister = false;
             this.showPolls = false;
@@ -67,7 +87,7 @@ new Vue({
                     password: this.password,
                 },
                 responseType: 'json'
-            }).then(function(response){
+            }).then(function (response) {
                 if (response.data.status === true) {
                     that.showLogin = false;
                     that.showRegister = false;
@@ -75,7 +95,7 @@ new Vue({
                 }
             })
         },
-        RegisterHandle: function(){
+        RegisterHandle: function () {
             this.showLogin = false;
             this.showRegister = true;
             this.showPolls = false;
@@ -89,7 +109,7 @@ new Vue({
                     password: this.password,
                 },
                 responseType: 'json'
-            }).then(function(response){
+            }).then(function (response) {
                 if (response.data.status === true) {
                     that.showLogin = false;
                     that.showRegister = false;

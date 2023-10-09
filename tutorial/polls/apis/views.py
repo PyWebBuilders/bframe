@@ -106,3 +106,14 @@ class UserChoiceViewSet(ViewSet):
 
     def get_session(self):
         return Session
+
+    def create(self):
+        sess = self.get_session()
+        body_kwargs = self.get_table_body_kwargs()
+        body_kwargs["userid"] = session["userid"]
+        obj = self.get_table(**body_kwargs)
+        sess.add(obj)
+        sess.query(Choice).filter_by(id=body_kwargs.get("choiceid")).update({Choice.votes: Choice.votes+1},
+                                                                            synchronize_session='evaluate')
+        sess.commit()
+        return self.to_serializer(obj, 1)

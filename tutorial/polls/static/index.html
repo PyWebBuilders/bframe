@@ -89,7 +89,7 @@
         </div>
       </div>
       <div class="choice-class">
-        <button class="tag" v-for="item in choiceData" :key="item.id">
+        <button @click="CommitChoiceHandle(item.id)" class="tag" v-for="item in choiceData" :key="item.id">
           {{item.content}}
         </button>
       </div>
