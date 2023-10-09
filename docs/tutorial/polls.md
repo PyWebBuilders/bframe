@@ -486,6 +486,352 @@
 
 ### 五、编辑前端页面，接上咱们开发的接口
 
+1. 添加前台界面（这部分使用vue2编辑，不太明白的小伙伴请移步至vue官网学习（笔者只是略微了解前端））
+
+    ```html
+    <!-- static/index.html -->
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap/5.1.3/css/bootstrap.css" type="text/css"
+        rel="stylesheet" />
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/bootstrap/5.1.3/js/bootstrap.js"
+        type="application/javascript"></script>
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-y/axios/0.26.0/axios.js"
+        type="application/javascript"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-y/vue/2.6.14/vue.js"
+        type="application/javascript"></script>
+    <link rel="stylesheet" href="main.css">
+    <title>polls</title>
+    </head>
+
+    <body>
+    <div id="app">
+        <div class="container-fluid">
+        <div id="login" v-if="showLogin">
+            <div id="login-form">
+            <form action="#">
+                <h1 style="text-align: center;">登 录</h1>
+                <div class="mb-3 row">
+                <label for="username-id-login" class="col-sm-2 col-form-label">用户名</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="username-id-login" placeholder="请填写用户名" v-model="username">
+                </div>
+                </div>
+                <div class="mb-3 row">
+                <label for="password-id-login" class="col-sm-2 col-form-label">密 码</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="password-id-login" placeholder="请填写密码"
+                    v-model="password">
+                </div>
+                </div>
+                <div class="mb-3 row">
+                <div class="col-sm-6">
+                    <input @click="LoginHandle" type="button" class="form-control" id="submit-id-l-login" value="登 录">
+                </div>
+                <div class="col-sm-6">
+                    <input @click="RegisterHandle" type="button" class="form-control" id="submit-id-l-register" value="注 册">
+                </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        <div id="register" v-if="showRegister">
+            <div id="login-form">
+            <form action="#">
+                <h1 style="text-align: center;">注 册</h1>
+                <div class="mb-3 row">
+                <label for="username-id-register" class="col-sm-2 col-form-label">用户名</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="username-id-register" placeholder="请填写用户名"
+                    v-model="username">
+                </div>
+                </div>
+                <div class="mb-3 row">
+                <label for="password-id-register" class="col-sm-2 col-form-label">密 码</label>
+                <div class="col-sm-10">
+                    <input type="password" class="form-control" id="password-id-register" placeholder="请填写密码"
+                    v-model="password">
+                </div>
+                </div>
+                <div class="mb-3 row">
+                <div class="col-sm-6">
+                    <input @click="LoginHandle" type="button" class="form-control" id="submit-id-r-login" value="登 录">
+                </div>
+                <div class="col-sm-6">
+                    <input @click="RegisterHandle" type="button" class="form-control" id="submit-id-r-register" value="注 册">
+                </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        </div>
+        <div class="polls-box" id="polls" v-if="showPolls">
+        <div class="quesion-class">
+            <div v-if="questions != undefined">
+            <div v-if="cursor >= questionCount">
+                <span class="q">{{ questions[0].content }}</span>
+            </div>
+            <div v-else>
+                <span class="q">{{ questions[cursor].content }}</span>
+            </div>
+            </div>
+        </div>
+        <div class="choice-class">
+            <button @click="CommitChoiceHandle(item.id)" class="tag" v-for="item in choiceData" :key="item.id">
+            {{item.content}}
+            </button>
+        </div>
+        </div>
+    </div>
+    </div>
+    <script src="/main.js"></script>
+    </body>
+
+    </html>
+    ```
+
+2. 添加相关的js代码
+
+    ```js
+    // static/main.js
+    new Vue({
+        el: "#app",
+        data: {
+            username: "",
+            password: "",
+            cursor: 0,
+            questions: undefined,
+            questionCount: 0,
+            choiceData: undefined,
+            showLogin: false,
+            showRegister: false,
+            showPolls: true,
+        },
+        created() {
+            this.CheckLogin();
+            this.GetQuestionsHandle();
+            this.GetQuestionsChoiceHandle();
+        },
+        watch: {
+            cursor: function (e) {
+                this.GetQuestionsChoiceHandle();
+            }
+        },
+        methods: {
+            CheckLogin: function () {
+                that = this;
+                axios({
+                    method: 'get',
+                    url: location.origin + '/questions',
+                    responseType: 'json'
+                }).then(function (response) {
+                    if (response.data === "no login") {
+                        that.showLogin = true;
+                        that.showRegister = false;
+                        that.showPolls = false;
+                    }
+                })
+            },
+            GetQuestionsHandle: function () {
+                that = this;
+                axios({
+                    method: 'get',
+                    url: location.origin + '/questions',
+                    responseType: 'json'
+                }).then(function (response) {
+                    console.log(response);
+                    that.questions = response.data.list;
+                    that.questionCount = response.data.count;
+                });
+            },
+            GetQuestionsChoiceHandle: function () {
+                that = this;
+                axios({
+                    method: 'get',
+                    url: location.origin + `/choices?question=${this.cursor + 1}`,
+                    responseType: 'json'
+                }).then(function (response) {
+                    that.choiceData = response.data.list;
+                });
+            },
+            CommitChoiceHandle: function (id) {
+                that = this;
+                axios({
+                    method: 'post',
+                    url: location.origin + `/user_choices`,
+                    data: {
+                        choiceid: id,
+                    },
+                    responseType: 'json'
+                }).then(function (response) {
+                    that.choiceData = response.data.list;
+                    that.cursor = that.cursor + 1 >= that.questionCount ? 0 : that.cursor + 1;
+                });
+
+            },
+            LoginHandle: function () {
+                this.showLogin = true;
+                this.showRegister = false;
+                this.showPolls = false;
+                console.log(this.username, this.password);
+                that = this;
+                axios({
+                    method: 'post',
+                    url: location.origin + '/login',
+                    data: {
+                        username: this.username,
+                        password: this.password,
+                    },
+                    responseType: 'json'
+                }).then(function (response) {
+                    if (response.data.status === true) {
+                        that.showLogin = false;
+                        that.showRegister = false;
+                        that.showPolls = true;
+                    }
+                })
+            },
+            RegisterHandle: function () {
+                this.showLogin = false;
+                this.showRegister = true;
+                this.showPolls = false;
+                console.log(this.username, this.password);
+                that = this;
+                axios({
+                    method: 'post',
+                    url: location.origin + '/register',
+                    data: {
+                        username: this.username,
+                        password: this.password,
+                    },
+                    responseType: 'json'
+                }).then(function (response) {
+                    if (response.data.status === true) {
+                        that.showLogin = false;
+                        that.showRegister = false;
+                        that.showPolls = true;
+                    }
+                })
+            }
+        }
+    })
+    ```
+
+3. 添加相关的css代码
+
+    ```css
+    /*
+    static/main.css
+    */
+    #login-form {
+        width: 60%;
+        margin-top: 20%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .polls-box {
+        margin: 10% auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .polls-box .quesion-class {
+        background-color: rgb(98, 251, 213);
+        box-shadow: 10px 10px 2px 1px rgba(0, 0, 255, .2);
+        border-radius: 10px;
+        width: 60%;
+        text-align: center;
+    }
+
+    .polls-box .choice-class {
+        margin-top: 20px;
+        width: 60%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .polls-box .choice-class .tag {
+        box-shadow: 10px 10px 2px 1px rgba(0, 0, 255, .2);
+        background-color: rgb(111, 98, 251);
+        border-radius: 10px;
+        width: 60%;
+        text-align: center;
+    }
+
+    .polls-box .quesion-class .q {
+        font-size: 100px;
+    }
+    .polls-box .choice-class .tag {
+        font-size: 60px;
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+    ```
+
+4. 更新app.py支持前端文件的获取
+
+    ```python
+    # app.py
+    from bframe import Frame
+    from bframe import Redirect
+
+
+    def create_app(config):
+        app = Frame(__name__, static_url="")
+        # 加载配置文件
+        app.Config.from_py(config)
+
+        # init sqlalchemy object
+        from models import init_models
+        init_models(app)
+
+        # init db object
+        from models import init_db, engine
+        init_db(engine)
+
+        # init apis
+        from apis.views import RegisterView, LoginView, UserViewSet, QuestionViewSet, ChoiceViewSet, UserChoiceViewSet
+        from bframe.generics import DefaultRouter
+        app.add_route("/register", RegisterView.as_view())
+        app.add_route("/login", LoginView.as_view())
+        router = DefaultRouter(app)
+        # router.register("/users", UserViewSet)
+        router.register("/questions", QuestionViewSet)
+        router.register("/choices", ChoiceViewSet)
+        router.register("/user_choices", UserChoiceViewSet)
+
+        @app.get("/ping")
+        def pong():
+            return "pong"
+        
+        @app.get("/")
+        @app.get("/index")
+        def index():
+            return Redirect("/index.html")
+
+        return app
+
+
+    app = create_app("config.py")
+
+    if __name__ == "__main__":
+        app.run()
+    ```
+
+
+
+
+
+
 
 
 
