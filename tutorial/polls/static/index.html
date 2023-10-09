@@ -24,23 +24,24 @@
           <form action="#">
             <h1 style="text-align: center;">登 录</h1>
             <div class="mb-3 row">
-              <label for="username-id" class="col-sm-2 col-form-label">用户名</label>
+              <label for="username-id-login" class="col-sm-2 col-form-label">用户名</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="username-id" placeholder="请填写用户名" v-model="username">
+                <input type="text" class="form-control" id="username-id-login" placeholder="请填写用户名" v-model="username">
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="password-id" class="col-sm-2 col-form-label">密 码</label>
+              <label for="password-id-login" class="col-sm-2 col-form-label">密 码</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="password-id" placeholder="请填写密码" v-model="password">
+                <input type="password" class="form-control" id="password-id-login" placeholder="请填写密码"
+                  v-model="password">
               </div>
             </div>
             <div class="mb-3 row">
               <div class="col-sm-6">
-                <input @click="LoginHandle" type="button" class="form-control" id="submit-id" value="登 录">
+                <input @click="LoginHandle" type="button" class="form-control" id="submit-id-l-login" value="登 录">
               </div>
               <div class="col-sm-6">
-                <input @click="RegisterHandle" type="button" class="form-control" id="submit-id" value="注 册">
+                <input @click="RegisterHandle" type="button" class="form-control" id="submit-id-l-register" value="注 册">
               </div>
             </div>
           </form>
@@ -51,31 +52,49 @@
           <form action="#">
             <h1 style="text-align: center;">注 册</h1>
             <div class="mb-3 row">
-              <label for="username-id" class="col-sm-2 col-form-label">用户名</label>
+              <label for="username-id-register" class="col-sm-2 col-form-label">用户名</label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="username-id" placeholder="请填写用户名" v-model="username">
+                <input type="text" class="form-control" id="username-id-register" placeholder="请填写用户名"
+                  v-model="username">
               </div>
             </div>
             <div class="mb-3 row">
-              <label for="password-id" class="col-sm-2 col-form-label">密 码</label>
+              <label for="password-id-register" class="col-sm-2 col-form-label">密 码</label>
               <div class="col-sm-10">
-                <input type="password" class="form-control" id="password-id" placeholder="请填写密码" v-model="password">
+                <input type="password" class="form-control" id="password-id-register" placeholder="请填写密码"
+                  v-model="password">
               </div>
             </div>
             <div class="mb-3 row">
               <div class="col-sm-6">
-                <input @click="LoginHandle" type="button" class="form-control" id="submit-id" value="登 录">
+                <input @click="LoginHandle" type="button" class="form-control" id="submit-id-r-login" value="登 录">
               </div>
               <div class="col-sm-6">
-                <input @click="RegisterHandle" type="button" class="form-control" id="submit-id" value="注 册">
+                <input @click="RegisterHandle" type="button" class="form-control" id="submit-id-r-register" value="注 册">
               </div>
             </div>
           </form>
         </div>
       </div>
-      </div>
-      <div id="polls" v-if="showPolls">polls</div>
     </div>
+    <div class="polls-box" id="polls" v-if="showPolls">
+      <div class="quesion-class">
+        <div v-if="questions != undefined">
+          <div v-if="cursor >= questionCount">
+            <span class="q">{{ questions[0].content }}</span>
+          </div>
+          <div v-else>
+            <span class="q">{{ questions[cursor].content }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="choice-class">
+        <button class="tag" v-for="item in choiceData" :key="item.id">
+          {{item.content}}
+        </button>
+      </div>
+    </div>
+  </div>
   </div>
   <script src="/main.js"></script>
 </body>

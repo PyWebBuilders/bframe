@@ -3,12 +3,18 @@ new Vue({
     data: {
         username: "",
         password: "",
+        cursor: 0,
+        questions: undefined,
+        questionCount: 0,
+        choiceData: undefined,
         showLogin: false,
         showRegister: false,
         showPolls: true,
     },
     created() {
         this.CheckLogin();
+        this.GetQuestionsHandle();
+        this.GetQuestionsChoiceHandle();
     },
     methods: {
         CheckLogin: function () {
@@ -26,12 +32,25 @@ new Vue({
             })
         },
         GetQuestionsHandle: function () {
+            that = this;
             axios({
                 method: 'get',
                 url: location.origin + '/questions',
                 responseType: 'json'
             }).then(function (response) {
                 console.log(response);
+                that.questions = response.data.list;
+                that.questionCount = response.data.count;
+            });
+        },
+        GetQuestionsChoiceHandle: function(){
+            that = this;
+            axios({
+                method: 'get',
+                url: location.origin + `/choices?question=${this.cursor+1}`,
+                responseType: 'json'
+            }).then(function (response) {
+                that.choiceData = response.data.list;
             });
         },
         LoginHandle: function(){
