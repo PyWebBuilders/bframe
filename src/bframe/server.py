@@ -23,10 +23,11 @@ SOFTWARE.
 """
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from bframe.logger import __logger as logger
+from bframe.logger import init_logger
 from bframe.wrappers import Cookie, Request, Response
 
-logger.module = __name__
+logger = init_logger()
+
 
 HTTP_METHOD = ["HEAD", "GET", "POST", "PUT", "DELETE"]
 

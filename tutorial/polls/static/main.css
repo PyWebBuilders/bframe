@@ -1,0 +1,48 @@
+#login-form {
+    width: 60%;
+    margin-top: 20%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.polls-box {
+    margin: 10% auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.polls-box .quesion-class {
+    background-color: rgb(98, 251, 213);
+    box-shadow: 10px 10px 2px 1px rgba(0, 0, 255, .2);
+    border-radius: 10px;
+    width: 60%;
+    text-align: center;
+}
+
+.polls-box .choice-class {
+    margin-top: 20px;
+    width: 60%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.polls-box .choice-class .tag {
+    box-shadow: 10px 10px 2px 1px rgba(0, 0, 255, .2);
+    background-color: rgb(111, 98, 251);
+    border-radius: 10px;
+    width: 60%;
+    text-align: center;
+}
+
+.polls-box .quesion-class .q {
+    font-size: 100px;
+}
+.polls-box .choice-class .tag {
+    font-size: 60px;
+    margin-left: 2px;
+    margin-right: 2px;
+}

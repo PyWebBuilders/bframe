@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bframe"
+dynamic = ["version"]
+authors = [{ name = "Bean-jun", email = "1342104001@qq.com" }]
+description = "A simple python web server frame"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Environment :: Web Environment",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Bean-jun/bframe"
+"Bug Tracker" = "https://github.com/Bean-jun/bframe/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "bframe.__version__" }

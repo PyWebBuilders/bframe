@@ -1,4 +1,5 @@
-### Bframe
+<div align=center><img src="docs/favicon.ico"></div>
+
 
 `bframe`是一个基于`WSGI`的协议的`web`框架。它非常像`flask`，但也会有`django restframework`的味道。
 

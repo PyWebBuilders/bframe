@@ -14,3 +14,5 @@ tutorial/bframer/bframer.db
 site/
 favicon.ico
 !docs/favicon.ico
+!tutorial/polls/static
+!tutorial/polls/static/favicon.ico

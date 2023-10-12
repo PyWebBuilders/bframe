@@ -29,7 +29,7 @@ from typing import Callable, Union
 from bframe import __version__
 from bframe.config import Config as config
 from bframe.logger import Logger as Log
-from bframe.logger import init_logger
+from bframe.logger import init_logger, INFO
 from bframe.route import Tree
 from bframe.server import HTTP_METHOD
 from bframe.server import Request
@@ -52,7 +52,7 @@ class Scaffold:
     RouteMapLock: threading.Lock = threading.Lock()
 
     # 日志
-    Logger: Log = init_logger(__name__)
+    Logger: Log = init_logger(INFO)
 
     # 配置文件
     Config: config = config()
