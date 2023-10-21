@@ -110,7 +110,7 @@ class Frame(Scaffold):
         return response
 
     def finally_handle(self, response: Response):
-        for handle in self.after_funs_list:
+        for handle in reversed(self.after_funs_list):
             response = handle(response)
         self.Session.save_session(response)
         return response

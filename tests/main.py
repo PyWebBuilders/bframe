@@ -1,3 +1,9 @@
+import os
+import sys
+sys.path.insert(0, os.path.join(os.getcwd(), "src"))  # noqa
+
+
+from bframe.generics import DefaultRouter
 from bframe.serizlizer import SimpleSerializer
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.orm import sessionmaker
@@ -245,7 +251,6 @@ class PhoneViewSet(ViewSet):
 app.add_route("/detail", Detail.as_view())
 app.add_route("/book", BookView.as_view())
 
-from bframe.generics import DefaultRouter
 
 router = DefaultRouter(app)
 router.register("/phone", PhoneViewSet)
