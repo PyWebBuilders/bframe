@@ -40,10 +40,6 @@ from bframe.sessions import MemorySession
 
 class Frame(Scaffold):
 
-    before_funs_list = list()
-    after_funs_list = list()
-    error_funs_dict = dict()
-
     # 会话消息
     Session: SessionMix = MemorySession()
 
@@ -77,29 +73,29 @@ class Frame(Scaffold):
                             headers={"Content-Type": "application/json"},
                             body=to_bytes(self.Serializer.dumps(resp)))
 
-    def add_before_handle(self, f):
-        self.before_funs_list.append(f)
-        return f
-
-    def add_after_handle(self, f):
-        self.after_funs_list.append(f)
-        return f
-
-    def add_error_handle(self, code):
-        def wrapper(f):
-            self.error_funs_dict[code] = f
-            return f
-        return wrapper
-
-    def before_handle(self):
-        for handle in self.before_funs_list:
-            rv = handle()
-            if rv:
-                return rv
-
     def dispatch_handle(self):
         handle = self.match_handle()
         return self.wrapper_response(handle(**req.Path_Args))
+
+    def before_handle(self):
+        names = (None, )
+
+        for name in names:
+            if name in self.before_funs_dict:
+                for handle in self.before_funs_dict[name]:
+                    rv = handle()
+                    if rv:
+                        return rv
+
+    def finally_handle(self, response: Response):
+        names = (None, )
+        for name in names:
+            if name in self.after_funs_dict:
+                for handle in reversed(self.after_funs_dict[name]):
+                    response = handle(response)
+
+        self.Session.save_session(response)
+        return response
 
     def error_handle(self, e):
         code = parse_except_code(e)
@@ -107,12 +103,6 @@ class Frame(Scaffold):
             response = self.wrapper_response(self.error_funs_dict[code]())
         else:
             response = Response(code, body=get_code_desc(code))
-        return response
-
-    def finally_handle(self, response: Response):
-        for handle in reversed(self.after_funs_list):
-            response = handle(response)
-        self.Session.save_session(response)
         return response
 
     def dispatch(self, r: Request):
