@@ -29,13 +29,14 @@ from bframe.scaffold import Scaffold
 from bframe.ctx import RequestCtx
 from bframe.ctx import request as req
 from bframe.server import Request, Response
-from bframe._except import NoSetControllerException
+from bframe._except import NoSetControllerException, RepeatYellowPrint
 from bframe.utils import get_code_desc
 from bframe.utils import parse_except_code
 from bframe.utils import to_bytes
 from bframe.utils import abort
 from bframe.sessions import SessionMix
 from bframe.sessions import MemorySession
+from bframe.yellowprint import YellowPrint
 
 
 class Frame(Scaffold):
@@ -45,6 +46,9 @@ class Frame(Scaffold):
 
     # 序列化
     Serializer = json
+
+    # yellow print
+    YellowPrints = dict()
 
     def static(self, *args, **kwds):
         file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
@@ -77,8 +81,14 @@ class Frame(Scaffold):
         handle = self.match_handle()
         return self.wrapper_response(handle(**req.Path_Args))
 
+    def get_yellowprint(self):
+        yellowprint = self.YellowPrints.get(req.path.lstrip("/").split("/")[0])
+        if yellowprint:
+            return yellowprint.yellowname
+        return -1
+
     def before_handle(self):
-        names = (None, )
+        names = (None, self.get_yellowprint())
 
         for name in names:
             if name in self.before_funs_dict:
@@ -88,7 +98,8 @@ class Frame(Scaffold):
                         return rv
 
     def finally_handle(self, response: Response):
-        names = (None, )
+        names = (None, self.get_yellowprint())
+
         for name in names:
             if name in self.after_funs_dict:
                 for handle in reversed(self.after_funs_dict[name]):
@@ -104,6 +115,11 @@ class Frame(Scaffold):
         else:
             response = Response(code, body=get_code_desc(code))
         return response
+
+    def register_yellowprint(self, yellowprint: YellowPrint):
+        if yellowprint.yellowname in self.YellowPrints:
+            raise RepeatYellowPrint
+        self.YellowPrints[yellowprint.yellowname] = yellowprint
 
     def dispatch(self, r: Request):
         ctx = RequestCtx(r, self)
