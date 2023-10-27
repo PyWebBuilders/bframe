@@ -32,6 +32,7 @@ from .utils import abort
 from .view import MethodView, View
 from .wrappers import Redirect, make_response
 from .wsgi import WSGIProxy
+from .yellowprint import YellowPrint
 
 __all__ = ["request", "g", "current_app", "Frame", "Redirect", "session", "SessionMix",
-           "Logger", "abort", "WSGIProxy", "View", "MethodView", "make_response"]
+           "Logger", "abort", "WSGIProxy", "View", "MethodView", "make_response", "YellowPrint"]
