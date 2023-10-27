@@ -7,18 +7,47 @@ from bframe import Frame
 from bframe import g, request, abort, current_app
 from bframe import MethodView
 from bframe import make_response
+from bframe.yellowprint import YellowPrint
 
 app = Frame(__name__)
 app.Config.from_py("_frame_config.py")
+yellow01_app = YellowPrint("yellow01")
+yellow02_app = YellowPrint("yellow02")
+app.register_yellowprint(yellow01_app)
+app.register_yellowprint(yellow02_app)
+
+
+@yellow02_app.add_before_app_handle
+def yellow02_before_001():
+    user = request.args.get("user")
+    if not user:
+        return {
+            "code": 200,
+            "status": False,
+            "msg": "未登录"
+        }
+
+
+@yellow01_app.get("/")
+def yellow01_index():
+    return "hello yellow01 api"
+
+
+@yellow02_app.get("/")
+def yellow02_index():
+    return "hello yellow02 api"
+
 
 @app.get("/")
 @app.get("/index")
 def index():
     return "hello world"
 
+
 @app.get("/conf")
 def conf():
     return dict(current_app.Config)
+
 
 @app.route("/login", method=["POST"])
 def login():
@@ -36,7 +65,7 @@ def login():
             "status": False,
             "msg": "账号密码异常"
         }
-    
+
     data = {
         "code": 200,
         "status": True,
@@ -60,6 +89,7 @@ def admin():
         }
     }
 
+
 @app.get("/api/user/<str:username>/profile")
 def users(username):
     return {
@@ -70,6 +100,7 @@ def users(username):
             "username": username
         }
     }
+
 
 @app.get("/admin/api/users/<int:uid>/profile")
 def users(uid):
@@ -109,21 +140,22 @@ class UserInfo(MethodView):
                 "userinfo": value
             }
         }
-    
+
     def get(self):
         return self.return_value("get")
-    
+
     def post(self):
         return self.return_value("post")
-    
+
     def put(self):
         return self.return_value("put")
-    
+
     def delete(self):
         return self.return_value("delete")
 
 
 app.add_route("/userinfo", UserInfo.as_view())
+yellow01_app.add_route("/userinfo", UserInfo.as_view())
 
 
 if __name__ == "__main__":

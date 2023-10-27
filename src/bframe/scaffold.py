@@ -57,9 +57,13 @@ class Scaffold:
     # 配置文件
     Config: config = config()
 
-     # 会话消息
+    # 会话消息
     SessionID = None
     Session = None
+
+    before_funs_dict = dict()
+    after_funs_dict = dict()
+    error_funs_dict = dict()
 
     def __init__(self, name: str = None, static_url="static", static_folder="static"):
         self.app_name = name
@@ -97,8 +101,10 @@ class Scaffold:
                   func_or_class: Callable,
                   method: MethodSenquenceAlias = None):
         with self.RouteMapLock:
-            handle_method = method or getattr(func_or_class, "method", ("GET", ))
-            handle_method = handle_method if isinstance(handle_method, (tuple, list)) else [handle_method]
+            handle_method = method or getattr(
+                func_or_class, "method", ("GET", ))
+            handle_method = handle_method if isinstance(
+                handle_method, (tuple, list)) else [handle_method]
             if inspect.isclass(func_or_class):
                 self.add_class_route(func_or_class, url, handle_method)
             else:
@@ -132,6 +138,20 @@ class Scaffold:
 
     def static(self, *args, **kwds):
         raise NotImplementedError
+
+    def add_before_handle(self, f):
+        self.before_funs_dict.setdefault(None, []).append(f)
+        return f
+
+    def add_after_handle(self, f):
+        self.after_funs_dict.setdefault(None, []).append(f)
+        return f
+
+    def add_error_handle(self, code):
+        def wrapper(f):
+            self.error_funs_dict[code] = f
+            return f
+        return wrapper
 
     def run(self, address: str = "127.0.0.1", port: int = 7256):
         self.Logger.info("run mode: no wsgi")

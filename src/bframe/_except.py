@@ -36,3 +36,8 @@ class NoSetControllerException(Exception):
 class AbortExcept(Exception):
     """手动抛出异常"""
     pass
+
+
+class RepeatYellowPrint(Exception):
+    """yellowprint 重复"""
+    pass

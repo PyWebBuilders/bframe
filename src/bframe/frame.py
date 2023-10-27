@@ -29,26 +29,26 @@ from bframe.scaffold import Scaffold
 from bframe.ctx import RequestCtx
 from bframe.ctx import request as req
 from bframe.server import Request, Response
-from bframe._except import NoSetControllerException
+from bframe._except import NoSetControllerException, RepeatYellowPrint
 from bframe.utils import get_code_desc
 from bframe.utils import parse_except_code
 from bframe.utils import to_bytes
 from bframe.utils import abort
 from bframe.sessions import SessionMix
 from bframe.sessions import MemorySession
+from bframe.yellowprint import YellowPrint
 
 
 class Frame(Scaffold):
-
-    before_funs_list = list()
-    after_funs_list = list()
-    error_funs_dict = dict()
 
     # 会话消息
     Session: SessionMix = MemorySession()
 
     # 序列化
     Serializer = json
+
+    # yellow print
+    YellowPrints = dict()
 
     def static(self, *args, **kwds):
         file_path = req.path.lstrip("/")[len(self.static_url):].lstrip("/")
@@ -77,29 +77,36 @@ class Frame(Scaffold):
                             headers={"Content-Type": "application/json"},
                             body=to_bytes(self.Serializer.dumps(resp)))
 
-    def add_before_handle(self, f):
-        self.before_funs_list.append(f)
-        return f
-
-    def add_after_handle(self, f):
-        self.after_funs_list.append(f)
-        return f
-
-    def add_error_handle(self, code):
-        def wrapper(f):
-            self.error_funs_dict[code] = f
-            return f
-        return wrapper
-
-    def before_handle(self):
-        for handle in self.before_funs_list:
-            rv = handle()
-            if rv:
-                return rv
-
     def dispatch_handle(self):
         handle = self.match_handle()
         return self.wrapper_response(handle(**req.Path_Args))
+
+    def get_yellowprint(self):
+        yellowprint = self.YellowPrints.get(req.path.lstrip("/").split("/")[0])
+        if yellowprint:
+            return yellowprint.yellowname
+        return -1
+
+    def before_handle(self):
+        names = (None, self.get_yellowprint())
+
+        for name in names:
+            if name in self.before_funs_dict:
+                for handle in self.before_funs_dict[name]:
+                    rv = handle()
+                    if rv:
+                        return rv
+
+    def finally_handle(self, response: Response):
+        names = (None, self.get_yellowprint())
+
+        for name in names:
+            if name in self.after_funs_dict:
+                for handle in reversed(self.after_funs_dict[name]):
+                    response = handle(response)
+
+        self.Session.save_session(response)
+        return response
 
     def error_handle(self, e):
         code = parse_except_code(e)
@@ -109,11 +116,10 @@ class Frame(Scaffold):
             response = Response(code, body=get_code_desc(code))
         return response
 
-    def finally_handle(self, response: Response):
-        for handle in self.after_funs_list:
-            response = handle(response)
-        self.Session.save_session(response)
-        return response
+    def register_yellowprint(self, yellowprint: YellowPrint):
+        if yellowprint.yellowname in self.YellowPrints:
+            raise RepeatYellowPrint
+        self.YellowPrints[yellowprint.yellowname] = yellowprint
 
     def dispatch(self, r: Request):
         ctx = RequestCtx(r, self)

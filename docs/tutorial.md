@@ -250,3 +250,38 @@ if __name__ == "__main__":
 "GENERIC_VIEW_DEFAULT_ORDER": "asc"                       # 数据查询排序字段顺序
 "GENERIC_VIEW_DEFAULT_ORDER_KEY": "_order"                # 数据查询排序字段顺序key
 ```
+
+
+### 支持子应用&子应用钩子
+
+```python
+from bframe import Frame
+from bframe import YellowPrint
+
+app = Frame(__name__)
+sub_app = YellowPrint("/sub")
+
+app.register_yellowprint(sub_app)
+
+# 子应用请求钩子
+@sub_app.add_before_app_handle
+def before():
+    pass
+
+# 子应用响应钩子
+@sub_app.add_after_app_handle
+def after(response):
+    return response
+
+@sub_app.get("/index")
+def sub_index():
+    return "index"
+
+@app.get("/index")
+def index():
+    return "index"
+
+
+if __name__ == "__main__":
+    app.run()
+```

@@ -77,6 +77,33 @@ class FrameTestCase(unittest.TestCase):
         response = self.client.delete("/userinfo", {})
         self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "delete", "响应数据异常")
     
+    def test_yellow01_index_01(self):
+        response = self.client.get("/yellow01/", {})
+        self.assertEqual(response.Body, b"hello yellow01 api", "响应数据异常")
+    
+    def test_yellow02_index_01(self):
+        response = self.client.get("/yellow02/?user=tom", {})
+        self.assertEqual(response.Body, b"hello yellow02 api", "响应数据异常")
+    
+    def test_yellow02_index_02(self):
+        response = self.client.get("/yellow02/", {})
+        self.assertEqual(json.loads(response.Body).get("msg"), "未登录", "响应数据异常")
+    
+    def test_yellow01_class_UserInfo_01(self):
+        response = self.client.get("/yellow01/userinfo")
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "get", "响应数据异常")
+    
+    def test_yellow01_class_UserInfo_02(self):
+        response = self.client.post("/yellow01/userinfo", {})
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "post", "响应数据异常")
+    
+    def test_yellow01_class_UserInfo_03(self):
+        response = self.client.put("/yellow01/userinfo", {})
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "put", "响应数据异常")
 
+    def test_yellow01_class_UserInfo_04(self):
+        response = self.client.delete("/yellow01/userinfo", {})
+        self.assertEqual(json.loads(response.Body).get("data", {}).get("userinfo"), "delete", "响应数据异常")
+    
 if __name__ == "__main__":
     unittest.main()

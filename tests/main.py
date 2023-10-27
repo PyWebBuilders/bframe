@@ -1,3 +1,9 @@
+import os
+import sys
+sys.path.insert(0, os.path.join(os.getcwd(), "src"))  # noqa
+
+
+from bframe.generics import DefaultRouter
 from bframe.serizlizer import SimpleSerializer
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.orm import sessionmaker
@@ -9,10 +15,32 @@ from bframe import (Frame, MethodView, Redirect, abort, current_app, g,
                     make_response, request, session)
 from bframe.server import Response
 from bframe.generics import ViewSet
+from bframe.yellowprint import YellowPrint
 
 app = Frame(__name__)
 app.Config["SESSION_ID"] = "pysession"
 # app.Config.from_py("config.py")
+api_app = YellowPrint("api")
+app.register_yellowprint(api_app)
+
+
+@api_app.add_before_handle
+def before_001():
+    print("before 001")
+
+
+@api_app.add_before_app_handle
+def before_002():
+    print("app before 02")
+
+
+@api_app.get("/api/home")
+def yellow_api_app_home():
+    return {
+        "id": 1,
+        "name": "海底两万里",
+        'content': "我是海底两万里"
+    }
 
 
 @app.get("/favicon.ico")
@@ -65,7 +93,7 @@ def before_01():
     name = request.Args.get("name")
     g.name = name
     g.url = request.Path
-    # print("req:", request.Method)
+    print("before_01 req:", request.Method)
 
 
 # 定义请求钩子
@@ -245,7 +273,6 @@ class PhoneViewSet(ViewSet):
 app.add_route("/detail", Detail.as_view())
 app.add_route("/book", BookView.as_view())
 
-from bframe.generics import DefaultRouter
 
 router = DefaultRouter(app)
 router.register("/phone", PhoneViewSet)

@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-__version__ = "0.0.16"
+__version__ = "0.0.17"
 
 
 from .ctx import current_app, g, request, session
@@ -32,6 +32,7 @@ from .utils import abort
 from .view import MethodView, View
 from .wrappers import Redirect, make_response
 from .wsgi import WSGIProxy
+from .yellowprint import YellowPrint
 
 __all__ = ["request", "g", "current_app", "Frame", "Redirect", "session", "SessionMix",
-           "Logger", "abort", "WSGIProxy", "View", "MethodView", "make_response"]
+           "Logger", "abort", "WSGIProxy", "View", "MethodView", "make_response", "YellowPrint"]
