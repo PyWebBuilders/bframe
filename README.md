@@ -51,6 +51,6 @@ python app.py
 
 ### LINKS
 
-项目文档: [https://bean-jun.github.io/bframe-docs/](https://bean-jun.github.io/bframe-docs/)
+项目文档: [https://github.com/PyWebBuilders/bframe-docs](https://pywebbuilders.github.io/bframe-docs/)
 
 项目DEMO: [https://github.com/PyWebBuilders/Plats.git](https://github.com/PyWebBuilders/Plats.git)
